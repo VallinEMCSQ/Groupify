@@ -4,6 +4,6 @@ Groupify is a Spotify extension that allows users to create a shared queue to wh
 
 By Sammy Clark, Cameron Vallin, Michelle Vu, and Teresa Vu
 
-##Ideas: 
+## Ideas: 
        Democratic song upvoting or Queue leader(Leader must approve queued songs) 
        Mini-Games: Guessing who queued a song, voting for worst song

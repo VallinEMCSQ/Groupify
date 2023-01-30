@@ -9,8 +9,8 @@ assignees: ''
 
 Story:
 
-###Description
+### Description
 
-###Tasks
--[ ] Task 1
--[ ] Task 2
+### Tasks
+- [ ] Task 1
+- [ ] Task 2

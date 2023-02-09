@@ -6,9 +6,10 @@
   - As a user, I want to upvote a song so that it moves up in the queue as well as be able to remove the vote.
 - What issues your team planned to address
   - Set up the Spotify SDK to be able to play music in the browser
-  - 
+  - Retrieve playlist information and complete authorization flow/user login
 - Which ones were successfully completed
   - The Spotify SDK was initialized.
-  - 
+  - Retrieve playlist information
 - Which ones didn't and why?
   - Although the Spotify SDK is initialized, it is not connected and set up to play music in browser. Also the user interface is extremely simple currently.
+  -  we could not complete the user login because the redirected url displays a message saying the client_id parameter is missing, which may indicate a missing value somewhere. 

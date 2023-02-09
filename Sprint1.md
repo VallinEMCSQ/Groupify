@@ -12,4 +12,6 @@
   - Retrieve playlist information
 - Which ones didn't and why?
   - Although the Spotify SDK is initialized, it is not connected and set up to play music in browser. Also the user interface is extremely simple currently.
+    We spent most of our time trying to set up the Spotify SDK to play music, which left the user interface bare. This issue was a little ambitious for the first
+    sprint.
   -  we could not complete the user login because the redirected url displays a message saying the client_id parameter is missing, which may indicate a missing value somewhere. 

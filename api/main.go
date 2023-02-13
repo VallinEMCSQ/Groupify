@@ -65,8 +65,8 @@ func prepareResponse() []Song {
 	var song Song
 
 	authConfig := &clientcredentials.Config{
-		ClientID:     "43f5bff771984f40889d8cc1a7acd679",
-		ClientSecret: "9ebeeda1289a47998ca0297ad91ad559",
+		ClientID:     "<CLIENT_ID>",
+		ClientSecret: "<CLIENT_SECRET>",
 		TokenURL:     spotify.TokenURL,
 	}
 

@@ -1,4 +1,4 @@
-package main
+/*package main
 
 import (
 	"context"
@@ -35,7 +35,7 @@ func main() {
 	log.Println("playlist id:", playlist.ID)
 	log.Println("playlist name:", playlist.Name)
 	log.Println("playlist description:", playlist.Description)
-}
+}*/
 
 // This example demonstrates how to authenticate with Spotify using the authorization code flow.
 // In order to run this example yourself, you'll need to:
@@ -45,7 +45,7 @@ func main() {
 //  2. Set the SPOTIFY_ID environment variable to the client ID you got in step 1.
 //  3. Set the SPOTIFY_SECRET environment variable to the client secret from step 1.
 
-/*package main
+package main
 
 import (
 	"context"
@@ -54,7 +54,7 @@ import (
 	"net/http"
 
 	"github.com/zmb3/spotify/v2"
-	"github.com/zmb3/spotify/v2/auth"
+	spotifyauth "github.com/zmb3/spotify/v2/auth"
 )
 
 // redirectURI is the OAuth redirect URI for the application.
@@ -110,54 +110,4 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	client := spotify.New(auth.Client(r.Context(), tok))
 	fmt.Fprintf(w, "Login Completed!")
 	ch <- client
-}*/
-
-/*package main
-
-import (
-	"context"
-	"fmt"
-	spotifyauth "github.com/zmb3/spotify/v2/auth"
-	"log"
-	"os"
-
-	"golang.org/x/oauth2/clientcredentials"
-
-	"github.com/zmb3/spotify/v2"
-)
-
-func main() {
-	ctx := context.Background()
-	config := &clientcredentials.Config{
-		ClientID:     os.Getenv("SPOTIFY_ID"),
-		ClientSecret: os.Getenv("SPOTIFY_SECRET"),
-		TokenURL:     spotifyauth.TokenURL,
-	}
-	token, err := config.Token(ctx)
-	if err != nil {
-		log.Fatalf("couldn't get token: %v", err)
-	}
-
-	httpClient := spotifyauth.New().Client(ctx, token)
-	client := spotify.New(httpClient)
-	// search for playlists and albums containing "holiday"
-	results, err := client.Search(ctx, "holiday", spotify.SearchTypePlaylist|spotify.SearchTypeAlbum)
-	if err != nil {
-		log.Fatal(err)
-	}
-
-	// handle album results
-	if results.Albums != nil {
-		fmt.Println("Albums:")
-		for _, item := range results.Albums.Albums {
-			fmt.Println("   ", item.Name)
-		}
-	}
-	// handle playlist results
-	if results.Playlists != nil {
-		fmt.Println("Playlists:")
-		for _, item := range results.Playlists.Playlists {
-			fmt.Println("   ", item.Name)
-		}
-	}
-}*/
+}

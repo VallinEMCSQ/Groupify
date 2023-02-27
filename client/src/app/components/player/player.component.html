@@ -1,1 +1,11 @@
-<p>player works!</p>
+<button className="btn-spotify" (click) = "previousTrack()">
+    &lt;&lt;
+</button>
+
+<button class="btn-spotify" (click) = "togglePlay()">
+   {{ is_paused ? "PLAY" : "PAUSE" }}
+</button>
+
+<button className="btn-spotify" (click) = "nextTrack()">
+    &gt;&gt;
+</button>

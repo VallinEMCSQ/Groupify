@@ -16,6 +16,9 @@ export class PlayerComponent implements OnInit, OnDestroy{
   devices:any;
   devicesForm:any;
 
+  is_paused = false;
+  is_active = false;
+
   constructor(){
     this.device_id = '';
     console.log('player component constructed');
@@ -159,84 +162,28 @@ export class PlayerComponent implements OnInit, OnDestroy{
     })
   }
 
-  // togglePlay(){
+  togglePlay(){
 
-  //   // if listening on local Web SDK player
-  //   if(this.device_id === this.player_state.device_id){
+      console.log("Toggle Play for Device: ",this.device_id);
+      this.player.togglePlay();
 
-  //     console.log("Toggle Play for Device: ",this.device_id);
-  //     this.player.togglePlay();
+  }
 
-  //   }else{
-  //   // else (listening on other devices)
+  previousTrack(){
 
-  //     if(!this.player_state?.is_playing){
-  //       // play
+      this.player.previousTrack().then(() => {
+        console.log("Playing previous track");
+      })
 
-  //       this.spotify.perform("endpoint-start-a-users-playback").subscribe(
-  //         (message:any) => {
-  //           console.log(message);
-  //         }
-  //       )
-  //     }else{
-  //       // stop
+  }
 
-  //       this.spotify.perform("endpoint-pause-a-users-playback").subscribe(
-  //         (message:any) => {
-  //           console.log(message);
-  //         }
-  //       )
-  //     }
+  nextTrack(){
 
-  //   }
+      this.player.nextTrack().then(() => {
+        console.log("Playing next track");
+      })
 
-
-  // }
-
-  // playPreviousTrack(){
-
-  //   // if listening on local Web SDK player
-  //   if(this.device_id === this.player_state.device_id){
-
-  //     this.player.previousTrack().then(() => {
-  //       console.log("Playing previous track");
-  //     })
-
-  //   }else{
-  //   // else (listening on other devices)
-
-  //     this.spotify.perform("endpoint-skip-users-playback-to-previous-track").subscribe(
-  //       (message:any) => {
-  //         console.log(message);
-  //       }
-  //     )
-
-  //   }
-
-  // }
-
-  // playNextTrack(){
-
-  //   // if listening on local Web SDK player
-  //   if(this.device_id === this.player_state.device_id){
-
-  //     this.player.nextTrack().then(() => {
-  //       console.log("Playing next track");
-  //     })
-
-  //   }else{
-  //   // else (listening on other devices)
-
-  //     this.spotify.perform("endpoint-skip-users-playback-to-next-track").subscribe(
-  //       (message:any) => {
-  //         console.log(message);
-  //       }
-  //     )
-
-  //   }
-
-
-  // }
+  }
 
   // incrementVolume(){
   //   console.log("Incrementing volume by 1%")

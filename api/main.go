@@ -1,42 +1,3 @@
-/*package main
-
-import (
-	"context"
-	"log"
-
-	"github.com/zmb3/spotify"
-	"golang.org/x/oauth2/clientcredentials"
-)
-
-func main() {
-	authConfig := &clientcredentials.Config{
-		ClientID:     "3a98bdcb00eb42408ed731cea7214c1c",
-		ClientSecret: "6fe390a7c516430caec1dea10f57d386",
-		TokenURL:     spotify.TokenURL,
-	}
-
-	accessToken, err := authConfig.Token(context.Background())
-	if err != nil {
-		log.Fatalf("error retrieve access token: %v", err)
-	}
-
-	client := spotify.Authenticator{}.NewClient(accessToken)
-
-	// try to use search function
-	results, err := client.Search("holiday", spotify.SearchTypePlaylist|spotify.SearchTypeAlbum)
-	log.Println("Results:", results)
-
-	playlistID := spotify.ID("37i9dQZF1DXcBWIGoYBM5M")
-	playlist, err := client.GetPlaylist(playlistID)
-	if err != nil {
-		log.Fatalf("error retrieve playlist data: %v", err)
-	}
-
-	log.Println("playlist id:", playlist.ID)
-	log.Println("playlist name:", playlist.Name)
-	log.Println("playlist description:", playlist.Description)
-}*/
-
 // This example demonstrates how to authenticate with Spotify using the authorization code flow.
 // In order to run this example yourself, you'll need to:
 //
@@ -53,6 +14,9 @@ import (
 	"log"
 	"net/http"
 
+	//"encoding/json"
+	"github.com/gorilla/mux"
+
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 )
@@ -68,18 +32,23 @@ var (
 	state = "abc123"
 )
 
-func main() {
-	// first start an HTTP server
-	http.HandleFunc("/callback", completeAuth)
-	http.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+func Run() {
+	router := mux.NewRouter()
+
+	router.HandleFunc("/callback", completeAuth)
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
 		log.Println("Got request for:", r.URL.String())
 	})
-	go func() {
-		err := http.ListenAndServe(":8080", nil)
-		if err != nil {
-			log.Fatal(err)
-		}
-	}()
+
+	err := http.ListenAndServe(":8080", router)
+	if err != nil {
+		log.Fatal("There's an error with the server", err)
+	}
+}
+
+func main() {
+	// start an HTTP server
+	Run()
 
 	url := auth.AuthURL(state)
 	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)

@@ -9,73 +9,20 @@
         Groupify
     </h1> 
     <p>
-        <a mat-fab extended color="basic" href="https://www.google.com/">
+        <a mat-fab extended color="warn" href="https://www.google.com/">
             <mat-icon>home</mat-icon>
-            Home
+            Create a Session
         </a>
     </p>
-    <!-- <p style="margin-bottom: -30px;">
-        <mat-form-field appearance="fill">
-          <mat-label>Email or Username</mat-label>
-          <input matInput placeholder="Ex. this@that.com">
-          <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-        </mat-form-field>
-    </p>
-    <p>
-        <mat-form-field appearance="fill">
-          <mat-label>Password</mat-label>
-          <input matInput placeholder="Ex. 12345">
-          <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
-        </mat-form-field>
-    </p> -->
     <p>
         Or<br>
         Join Existing Session
     </p>
     <div style="margin: 20px;">
         <input type="number" placeholder="Session PIN" style="margin-right: 10px">
-        <a mat-fab extended color="basic">
+        <a mat-fab extended color="warn">
             Join
         </a>
     </div>
-    <script src="https://sdk.scdn.co/spotify-player.js"></script>
-    <script>
-        window.onSpotifyWebPlaybackSDKReady = () => {
-            const token = 'BQDkFZNfd6HfGW269L3mGunHK4NCCxM1f4xgLIunHuFTt1cPGxu6G4GcFkKQao-EBOqm3aQYegpX5XmMgZXp2XLdbXrjQANthONMj1XfiLqjzmTDmLRir8YAOmzwGN_OS-JMOa3Yq0rf9rneMQI5b_j7UPSAwrhLNdcNavhnK0afCUG5dbfSjXMrWNf2Mdnc9g';
-            const player = new Spotify.Player({
-                name: 'Web Playback SDK Quick Start Player',
-                getOAuthToken: cb => { cb(token); },
-                volume: 0.5
-            });
-
-            // Ready
-            player.addListener('ready', ({ device_id }) => {
-                console.log('Ready with Device ID', device_id);
-            });
-
-            // Not Ready
-            player.addListener('not_ready', ({ device_id }) => {
-                console.log('Device ID has gone offline', device_id);
-            });
-
-            player.addListener('initialization_error', ({ message }) => {
-                console.error(message);
-            });
-
-            player.addListener('authentication_error', ({ message }) => {
-                console.error(message);
-            });
-
-            player.addListener('account_error', ({ message }) => {
-                console.error(message);
-            });
-
-            document.getElementById('togglePlay').onclick = function() {
-              player.togglePlay();
-            };
-
-            player.connect();
-        }
-    </script>
 </body>
 </html>

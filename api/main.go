@@ -8,6 +8,7 @@
 package main
 
 import (
+
 	"context"
 	"encoding/json"
 	"fmt"
@@ -19,6 +20,7 @@ import (
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2"
+
 )
 
 // redirectURI is the OAuth redirect URI for the application.
@@ -99,9 +101,9 @@ func run() {
 			log.Fatal(err)
 		}
 	}()
-}
 
 func main() {
+
 
 	run()
 
@@ -124,6 +126,7 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
 		log.Fatal(err)
+
 	}
 	if st := r.FormValue("state"); st != state {
 		http.NotFound(w, r)
@@ -134,6 +137,7 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	client := spotify.New(auth.Client(r.Context(), tok))
 	fmt.Fprintf(w, "Login Completed!")
 	ch <- client
+  http.Redirect(w, r, "http://localhost:4200", http.StatusSeeOther)
 }
 
 func addsong(writer http.ResponseWriter, request *http.Request) {

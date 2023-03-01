@@ -1,7 +1,7 @@
 package main
 
 import (
-	"context"
+	//"context"
 	"encoding/json"
 	"fmt"
 	"log"
@@ -9,85 +9,69 @@ import (
 
 	"github.com/gorilla/mux"
 	"github.com/zmb3/spotify"
-	"golang.org/x/oauth2/clientcredentials"
+	"golang.org/x/oauth2"
 )
 
-type Response struct {
-	Songs []Song `json:"songs"`
-}
+const (
+	redirectURI = "http://localhost:8080/callback"
+	state       = "abc123" // a random state value for security
+)
 
-type Song struct {
-	Id        spotify.ID    `json:"id"`
-	SongName  string 		`json:"songName"`
-}
+var (
+	auth = spotify.NewAuthenticator(
+		redirectURI,
+		spotify.ScopeUserReadPrivate,
+		spotify.ScopeUserReadEmail,
+	)
+	ch = make(chan *spotify.Client)
+)
 
 func main() {
-	log.Println("starting API server")
-	//create a new router
+
 	router := mux.NewRouter()
-	log.Println("creating routes")
-	//specify endpoints
-	router.HandleFunc("/health-check", HealthCheck).Methods("GET")
-	router.HandleFunc("/songs", Songs).Methods("GET")
-	http.Handle("/", router)
 
-	//start and listen to requests
-	http.ListenAndServe(":8000", router)
 
-}
+	router.HandleFunc("/callback", completeAuth)
+	router.HandleFunc("/", startAuth)
 
-func HealthCheck(w http.ResponseWriter, r *http.Request) {
-	log.Println("entering health check end point")
-	w.WriteHeader(http.StatusOK)
-	fmt.Fprintf(w, "API is up and running")
-}
+	go http.ListenAndServe(":8080", router)
 
-func Songs(w http.ResponseWriter, r *http.Request) {
-	log.Println("entering songs end point")
-	var response Response
-	songs := prepareResponse()
+	fmt.Println("Please visit http://localhost:8080 to authenticate this application.")
+	client := <-ch
 
-	response.Songs = songs
-
-	w.Header().Set("Content-Type", "application/json")
-	w.WriteHeader(http.StatusOK)
-	jsonResponse, err := json.Marshal(response)
+	user, err := client.CurrentUser()
 	if err != nil {
+		fmt.Printf("Error getting current user: %s\n", err.Error())
 		return
 	}
 
-	w.Write(jsonResponse)
+	fmt.Printf("You are logged in as: %s\n", user.ID)
 }
 
-func prepareResponse() []Song {
-	var songs []Song
+func startAuth(w http.ResponseWriter, r *http.Request) {
+	url := auth.AuthURL(state)
+	http.Redirect(w, r, url, http.StatusFound)
+}
 
-	var song Song
-
-	authConfig := &clientcredentials.Config{
-		ClientID:     "<CLIENT_ID>",
-		ClientSecret: "<CLIENT_SECRET>",
-		TokenURL:     spotify.TokenURL,
-	}
-
-	accessToken, err := authConfig.Token(context.Background())
+func completeAuth(w http.ResponseWriter, r *http.Request) {
+	tok, err := auth.Token(state, r)
 	if err != nil {
-		log.Fatalf("error retrieve access token: %v", err)
+		http.Error(w, "Couldn't get token", http.StatusForbidden)
+		return
 	}
 
-	client := spotify.Authenticator{}.NewClient(accessToken)
-
-
-    //https://open.spotify.com/track/3AVyKOmMgvRjsC576xWw78?si=5ba44b3dd44d43a9
-	trackID := spotify.ID("3AVyKOmMgvRjsC576xWw78?si=5ba44b3dd44d43a9")
-	track, err := client.GetTrack(trackID)
-	if err != nil {
-		log.Fatalf("error retrieve track data: %v", err)
+	response := map[string]*oauth2.Token{
+		"token": tok,
 	}
 
-	song.Id = track.ID
-	song.SongName = track.Name
-	songs = append(songs, song)
+	w.Header().Set("Content-type", "application/json")
+	err1 := json.NewEncoder(w).Encode(response)
+	if err1 != nil {
+		log.Fatalln("There was an error encoding the token")
+	}
 
-	return songs
+	// create a client using the specified token
+	//client := auth.NewClient(tok)
+	fmt.Fprintf(w, "Login complete!")
+	//ch <- &client
 }

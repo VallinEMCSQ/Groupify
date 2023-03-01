@@ -1,82 +1,77 @@
-// This example demonstrates how to authenticate with Spotify using the authorization code flow.
-// In order to run this example yourself, you'll need to:
-//
-//  1. Register an application at: https://developer.spotify.com/my-applications/
-//     - Use "http://localhost:8080/callback" as the redirect URI
-//  2. Set the SPOTIFY_ID environment variable to the client ID you got in step 1.
-//  3. Set the SPOTIFY_SECRET environment variable to the client secret from step 1.
-
 package main
 
 import (
-	"context"
+	//"context"
+	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
 
-	//"encoding/json"
 	"github.com/gorilla/mux"
-
-	spotifyauth "github.com/zmb3/spotify/v2"
-	spotifyauth "github.com/zmb3/spotify/v2/auth"
+	"github.com/zmb3/spotify"
+	"golang.org/x/oauth2"
 )
 
-// redirectURI is the OAuth redirect URI for the application.
-// You must register an application at Spotify's developer portal
-// and enter this value.
-const redirectURI = "http://localhost:8080/callback"
+const (
+	redirectURI = "http://localhost:8080/callback"
+	state       = "abc123" // a random state value for security
+)
 
 var (
-	auth  = spotifyauth.New(spotifyauth.WithRedirectURL(redirectURI), spotifyauth.WithScopes(spotifyauth.ScopeUserReadPrivate))
-	ch    = make(chan *spotify.Client)
-	state = "abc123"
+	auth = spotify.NewAuthenticator(
+		redirectURI,
+		spotify.ScopeUserReadPrivate,
+		spotify.ScopeUserReadEmail,
+	)
+	ch = make(chan *spotify.Client)
 )
 
-func Run() {
+func main() {
+
 	router := mux.NewRouter()
 
+
 	router.HandleFunc("/callback", completeAuth)
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Got request for:", r.URL.String())
-	})
+	router.HandleFunc("/", startAuth)
 
-	err := http.ListenAndServe(":8080", router)
-	if err != nil {
-		log.Fatal("There's an error with the server", err)
-	}
-}
+	go http.ListenAndServe(":8080", router)
 
-func main() {
-	// start an HTTP server
-	Run()
-
-	url := auth.AuthURL(state)
-	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
-
-	// wait for auth to complete
+	fmt.Println("Please visit http://localhost:8080 to authenticate this application.")
 	client := <-ch
 
-	// use the client to make calls that require authorization
-	user, err := client.CurrentUser(context.Background())
+	user, err := client.CurrentUser()
 	if err != nil {
-		log.Fatal(err)
+		fmt.Printf("Error getting current user: %s\n", err.Error())
+		return
 	}
-	fmt.Println("You are logged in as:", user.ID)
+
+	fmt.Printf("You are logged in as: %s\n", user.ID)
+}
+
+func startAuth(w http.ResponseWriter, r *http.Request) {
+	url := auth.AuthURL(state)
+	http.Redirect(w, r, url, http.StatusFound)
 }
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
-	tok, err := auth.Token(r.Context(), state, r)
+	tok, err := auth.Token(state, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
-		log.Fatal(err)
-	}
-	if st := r.FormValue("state"); st != state {
-		http.NotFound(w, r)
-		log.Fatalf("State mismatch: %s != %s\n", st, state)
+		return
 	}
 
-	// use the token to get an authenticated client
-	client := spotify.New(auth.Client(r.Context(), tok))
-	fmt.Fprintf(w, "Login Completed!")
-	ch <- client
+	response := map[string]*oauth2.Token{
+		"token": tok,
+	}
+
+	w.Header().Set("Content-type", "application/json")
+	err1 := json.NewEncoder(w).Encode(response)
+	if err1 != nil {
+		log.Fatalln("There was an error encoding the token")
+	}
+
+	// create a client using the specified token
+	//client := auth.NewClient(tok)
+	fmt.Fprintf(w, "Login complete!")
+	//ch <- &client
 }

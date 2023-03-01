@@ -1,5 +1,9 @@
 import { Component, OnInit } from '@angular/core';
-import { JoinScreenService } from './join-screen.service';
+import { JoinScreenService } from '../../services/join-screen.service';
+
+export interface Login {
+  link: string;
+}
 
 @Component({
   selector: 'app-join-screen',
@@ -7,17 +11,19 @@ import { JoinScreenService } from './join-screen.service';
   styleUrls: ['./join-screen.component.css']
 })
 export class JoinScreenComponent implements OnInit {
-  loginUrl = "";
+  loginUrl: any;
 
   constructor(private _joinScreenService: JoinScreenService) {}
 
   ngOnInit(): void {
-    this._joinScreenService.getAuthUrl()
-      .subscribe(data => this.loginUrl = data);
+    this._joinScreenService.getAuthUrl() // returns an Observable which can be handled using subscribe
+      .subscribe(
+        response => { // the response received from http request is a json with map of key "link" and value of type string
+          this.loginUrl = response.link
+          console.log("response received and stored: ")
+          console.log(this.loginUrl)
+        }
+        );
   }
 
-  getAuthUrl() {
-    this._joinScreenService.getAuthUrl()
-      .subscribe(data => this.loginUrl = data);
-  }
 }

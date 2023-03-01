@@ -2,17 +2,41 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Spotify Web Playback SDK Quick Start</title>
+    <title>Spotify Web Playback SDK Quick Start</title>   
 </head>
 <body>
-<app-player></app-player>
-    <h1>Spotify Web Playback SDK Quick Start</h1>
-    <button id="togglePlay">Toggle Play</button>
+    <h1>
+        Groupify
+    </h1> 
+    <p>
+        <a mat-fab extended color="basic" href="https://www.google.com/">
+            <mat-icon>home</mat-icon>
+            Home
+        </a>
+    </p>
+    <!-- <p style="margin-bottom: -30px;">
+        <mat-form-field appearance="fill">
+          <mat-label>Email or Username</mat-label>
+          <input matInput placeholder="Ex. this@that.com">
+          <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+        </mat-form-field>
+    </p>
+    <p>
+        <mat-form-field appearance="fill">
+          <mat-label>Password</mat-label>
+          <input matInput placeholder="Ex. 12345">
+          <mat-icon matSuffix>sentiment_very_satisfied</mat-icon>
+        </mat-form-field>
+    </p> -->
+    <p>
+        Or<br>
+        Join Existing Session
+    </p>
     <div style="margin: 20px;">
-        <input type="text" placeholder="Session PIN">
-        <button mat-fab extended class="join-button">
+        <input type="number" placeholder="Session PIN" style="margin-right: 10px">
+        <a mat-fab extended color="basic">
             Join
-        </button>
+        </a>
     </div>
     <script src="https://sdk.scdn.co/spotify-player.js"></script>
     <script>

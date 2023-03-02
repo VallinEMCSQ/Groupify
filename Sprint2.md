@@ -39,4 +39,4 @@ The style and design of the pages has been modeled after Spotify's design and ut
 
 ### Testing
 In our backend unit tests, we have a tests for our HealthCheck handler, SendRedirectURI Handler, and our TestSendToken Handler.
-In our frontend tests, cypress clicks the login button to check if the program is redirected to the right link.
+In our frontend tests, cypress clicks the login button to check if the program is redirected to the right link in end-to-end testing. In component testing, we mount the components player and join-screen.

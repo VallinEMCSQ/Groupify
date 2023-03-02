@@ -112,11 +112,7 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	client := spotify.New(auth.Client(r.Context(), tok))
 	fmt.Fprintf(w, "Login Completed!")
 	ch <- client
-<<<<<<< Updated upstream
-  http.Redirect(w, r, "http://localhost:4200", http.StatusSeeOther)
-=======
 	//http.Redirect(w, r, "http://localhost:4200", http.StatusSeeOther)
->>>>>>> Stashed changes
 }
 
 func healthCheck(writer http.ResponseWriter, request *http.Request) {

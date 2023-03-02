@@ -13,33 +13,26 @@
 <body>
     <div class="container">
         <!-- <h1 style="color: whitesmoke">{{title}}</h1> -->
-        <h1>Groupify</h1>
+        <h1 font><img src="assets/white-logo.png" height="30" alt="Spotify logo">Groupify</h1>
+        
 
-        <img src="assets/black-logo.png" height="50" alt="Spotify logo">
 
         <hr>
 
         <form action="">    
             <div>
-                <input type="text" id="pin" name="pin" placeholder="Session PIN">
+                <input type="number" placeholder="Session PIN" style="margin-right: 10px">
+                <a mat-fab extended href="https://open.spotify.com/?" target=_blank title="For now, this takes you to Spotify">
+                    Join
+                </a>    
             </div>
 
         </form>
-        <div>
-            <a href="https://open.spotify.com/?" target=_blank title="For now, this takes you to Spotify"> 
-                <!-- <button mat-fab extended class="join-button"> -->
-                <button class="join-button">
-                    Join
-                </button>
-            </a>
-        </div>
-        <small>
-            or
+        or
             <br>
-            <a href={{loginUrl}} title="Login to Spotify">
+            <a mat-button href="https://open.spotify.com/?" title="Login to Spotify">
                 Login to Spotify to host a session
             </a>
-        </small>
     </div>
 </body>
 </html>

@@ -9,10 +9,13 @@
     <!--make webpage scale on mobile devices-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
+<header>
+  <h1><img src="assets/white-logo.png" alt="Logo" width="40px"/>Groupify</h1>
+</header>
 <body>
-  <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+  <form [formGroup]="searchForm" (ngSubmit)="onSearch()" style="margin-bottom: 15px;">
     <input type="text" placeholder="Search songs" formControlName="search" />
-    <button type="submit">Search</button>
+    <button ba type="submit" >Search</button>
   </form>
   
   <!-- <div *ngIf="currentTrack">
@@ -20,10 +23,10 @@
     <p>{{ currentTrack.artists[0].name }}</p>
     <img [src]="currentTrack.album.images[0].url" alt="" />
    -->
-    <button (click)="onPlay()">Play</button>
+    <button mat-fab extended (click)="onPlay()">Play</button>
     <!-- <button (click)="onPause()">Pause</button> -->
-    <button (click)="onNext()">Next</button>
-    <button (click)="onPrevious()">Previous</button>
+    <button mat-fab extended (click)="onNext()">Next</button>
+    <button mat-fab extended (click)="onPrevious()">Previous</button>
   <!-- </div> -->
 </body>
 </html>

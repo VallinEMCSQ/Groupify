@@ -1,0 +1,14 @@
+body, header, html{
+    background-color: black;
+}
+body{
+    text-align: center;
+}
+button{
+    background-color: #1DB954;
+    margin: 3px;
+}
+header{
+    color: whitesmoke;
+    margin-top: 5px;
+}

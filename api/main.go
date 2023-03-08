@@ -8,7 +8,6 @@
 package main
 
 import (
-
 	"context"
 	"encoding/json"
 	"fmt"
@@ -20,7 +19,6 @@ import (
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2"
-
 )
 
 // redirectURI is the OAuth redirect URI for the application.
@@ -32,7 +30,7 @@ var (
 	auth  = spotifyauth.New(spotifyauth.WithRedirectURL(redirectURI), spotifyauth.WithScopes(spotifyauth.ScopeUserReadPrivate))
 	ch    = make(chan *spotify.Client)
 	state = "abc123"
-	tok   *oauth2.Token
+	token *oauth2.Token
 )
 
 type Person struct {
@@ -51,36 +49,9 @@ func run() {
 
 	// handle functions
 	router.HandleFunc("/callback", completeAuth)
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Got request for:", r.URL.String())
-	})
-	router.HandleFunc("/link", func(w http.ResponseWriter, r *http.Request) { // sends redirect URI to frontend
-		// Create a map to hold the response data
-		response := map[string]string{
-			"link": redirectURI,
-		}
-		// Set the response Content-Type to application/json
-		w.Header().Set("Content-Type", "application/json")
-		// Encode the response data as JSON and write it to the response writer
-		err := json.NewEncoder(w).Encode(response)
-		if err != nil {
-			log.Fatalln("There was an error encoding the URI link")
-		}
-	}).Methods("GET")
-	router.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) { // sends token to frontend
-		fmt.Println(tok)
-		// Create a map to hold the response data
-		response := map[string]*oauth2.Token{
-			"token": tok,
-		}
-		// Set the response Content-Type to application/json
-		w.Header().Set("Content-Type", "application/json")
-		// Encode the response data as JSON and write it to the response writer
-		err := json.NewEncoder(w).Encode(response)
-		if err != nil {
-			log.Fatalln("There was an error encoding the token")
-		}
-	}).Methods("GET")
+	router.HandleFunc("/", healthCheck)
+	router.HandleFunc("/link", sendRedirectURI).Methods("GET")
+	router.HandleFunc("/token", sendToken).Methods("GET")
 	router.HandleFunc("/addsong", addsong).Methods("POST")
 	router.HandleFunc("/getsong", getsong).Methods("GET")
 	router.HandleFunc("/deletesong", deletesong).Methods("DELETE")
@@ -101,9 +72,9 @@ func run() {
 			log.Fatal(err)
 		}
 	}()
+}
 
 func main() {
-
 
 	run()
 
@@ -122,11 +93,12 @@ func main() {
 }
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
+
 	tok, err := auth.Token(r.Context(), state, r)
+	token = tok
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
 		log.Fatal(err)
-
 	}
 	if st := r.FormValue("state"); st != state {
 		http.NotFound(w, r)
@@ -136,10 +108,48 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	// use the token to get an authenticated client
 	client := spotify.New(auth.Client(r.Context(), tok))
 	fmt.Fprintf(w, "Login Completed!")
+	http.Redirect(w, r, "http://localhost:4200", http.StatusSeeOther)
 	ch <- client
-  http.Redirect(w, r, "http://localhost:4200", http.StatusSeeOther)
 }
 
+func healthCheck(writer http.ResponseWriter, request *http.Request) {
+	log.Println("Got request for:", request.URL.String())
+}
+
+func sendRedirectURI(writer http.ResponseWriter, request *http.Request) {
+	// Create a map to hold the response data
+	response := map[string]string{
+		"link": auth.AuthURL(state),
+	}
+	// Set the response Content-Type to application/json
+	writer.Header().Set("Content-Type", "application/json")
+	// Encode the response data as JSON and write it to the response writer
+	err := json.NewEncoder(writer).Encode(response)
+	if err != nil {
+		log.Fatalln("There was an error encoding the URI link")
+	}
+}
+
+// FIX ME
+func sendToken(writer http.ResponseWriter, request *http.Request) {
+	// Create a map to hold the response data
+	response := map[string]*oauth2.Token{
+		"token": token,
+	}
+	// Set the response Content-Type to application/json
+	writer.Header().Set("Content-Type", "application/json")
+	// Encode the response data as JSON and write it to the response writer
+	err := json.NewEncoder(writer).Encode(response)
+	if err != nil {
+		log.Fatalln("There was an error encoding the token")
+	}
+}
+
+/*
+	func redirect(writer http.ResponseWriter, request *http.Request) {
+		http.Redirect(writer, request, "http://localhost:4200", http.StatusSeeOther)
+	}
+*/
 func addsong(writer http.ResponseWriter, request *http.Request) {
 
 }

@@ -19,9 +19,5 @@ export class JoinScreenService {
     console.log("join-screen.service: Getting auth url through http request");
     return this.http.get('http://localhost:8080/link');
   }
-  
-  getToken(): Observable<any> {
-    console.log("join-screen.service: Getting token through http request")
-    return this.http.get('http://localhost:8080/token')
-  }
+
 }

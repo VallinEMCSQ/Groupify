@@ -9,30 +9,16 @@
     <!--make webpage scale on mobile devices-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
-<!-- <body style="background-color: black;"> -->
 <body>
     <div class="container">
-        <!-- <h1 style="color: whitesmoke">{{title}}</h1> -->
         <h1 font><img src="assets/white-logo.png" height="30" alt="Spotify logo">Groupify</h1>
-        
-
 
         <hr>
 
-        <form action="">    
-            <div>
-                <input type="number" placeholder="Session PIN" style="margin-right: 10px">
-                <a mat-fab extended href="https://open.spotify.com/?" target=_blank title="For now, this takes you to Spotify">
-                    Join
-                </a>    
-            </div>
-
-        </form>
-        or
-            <br>
-            <a mat-button href="https://open.spotify.com/?" title="Login to Spotify">
-                Login to Spotify to host a session
-            </a>
+        <br>
+        <a mat-button href="{{loginUrl}}" title="Login to Spotify">
+            Login to Spotify to listen
+        </a>
     </div>
 </body>
 </html>

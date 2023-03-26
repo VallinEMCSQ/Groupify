@@ -77,7 +77,7 @@ export class SpotifyService {
 
   connectPlayer(){
     // const token = this._joinScreenService.getAuthUrl();
-    const token = 'BQCgy4Cp7C-zdDA5jP5qk6IRL1RkGu_-fvEwlVhCSbU6jR2FrpXybthpNhq4uqedYqDdW3Y-EX__FQDHa_k6au2wkx_YIUcyVnECh3oev8Lms8BsQXKj-aKVVqdQg32jWlYJTeJVrz_x5xuOJFRylDp3Ah5Lw7kK0c7-cDGrCzUXYpOvyweKmcF-v9oPadjpdw';
+    const token = 'BQCyxw3XhOd5Cagj2-zr6KqvhC-hwhPl9XRA1SHMgV2F_5u92sg9cwbQQfzVCq-OFNUpplFpC-k_5lRoDNXRS9pi-IQ_v8becwQppGXl6hzRVQYyUAEPhTxDPgMABLXS_TH8JesFTAC8HPSbZTHueUFKIzzmTUW2FcEeJNrNeK7f5QawhkVOWbN_I73E5XleTg';
     this.player = new Spotify.Player({
       name: 'Web Playback SDK Quick Start Player',
       getOAuthToken: (cb:any) => { cb(token); },

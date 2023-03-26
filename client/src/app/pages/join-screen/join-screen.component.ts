@@ -13,17 +13,17 @@ export interface Login {
 export class JoinScreenComponent implements OnInit {
   loginUrl: any;
 
-  constructor(private _joinScreenService: JoinScreenService) {}
+  constructor(private joinScreenService: JoinScreenService) {}
 
   ngOnInit(): void {
-    this._joinScreenService.getAuthUrl() // returns an Observable which can be handled using subscribe
+    this.joinScreenService.getAuthUrl() // returns an Observable which can be handled using subscribe
       .subscribe(
         response => { // the response received from http request is a json with map of key "link" and value of type string
           this.loginUrl = response.link
-          console.log("response received and stored: ")
-          console.log(this.loginUrl)
+          console.log("Response received and stored: ", this.loginUrl)
         }
         );
+
   }
 
 }

@@ -8,25 +8,25 @@
 package main
 
 import (
-
 	"context"
 	"encoding/json"
 	"fmt"
 	"log"
 	"net/http"
-	
+
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
 	"github.com/zmb3/spotify/v2"
 	spotifyauth "github.com/zmb3/spotify/v2/auth"
 	"golang.org/x/oauth2"
-
 )
 
 // redirectURI is the OAuth redirect URI for the application.
 // You must register an application at Spotify's developer portal
 // and enter this value.
-const redirectURI = "http://localhost:8080/callback"
+const redirectURI = "http://localhost:4200/start"
+
+// const redirectURI = "http://localhost:8080/callback"
 
 var (
 	auth  = spotifyauth.New(spotifyauth.WithRedirectURL(redirectURI), spotifyauth.WithScopes(spotifyauth.ScopeUserReadPrivate))
@@ -51,36 +51,9 @@ func run() {
 
 	// handle functions
 	router.HandleFunc("/callback", completeAuth)
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		log.Println("Got request for:", r.URL.String())
-	})
-	router.HandleFunc("/link", func(w http.ResponseWriter, r *http.Request) { // sends redirect URI to frontend
-		// Create a map to hold the response data
-		response := map[string]string{
-			"link": redirectURI,
-		}
-		// Set the response Content-Type to application/json
-		w.Header().Set("Content-Type", "application/json")
-		// Encode the response data as JSON and write it to the response writer
-		err := json.NewEncoder(w).Encode(response)
-		if err != nil {
-			log.Fatalln("There was an error encoding the URI link")
-		}
-	}).Methods("GET")
-	router.HandleFunc("/token", func(w http.ResponseWriter, r *http.Request) { // sends token to frontend
-		fmt.Println(tok)
-		// Create a map to hold the response data
-		response := map[string]*oauth2.Token{
-			"token": tok,
-		}
-		// Set the response Content-Type to application/json
-		w.Header().Set("Content-Type", "application/json")
-		// Encode the response data as JSON and write it to the response writer
-		err := json.NewEncoder(w).Encode(response)
-		if err != nil {
-			log.Fatalln("There was an error encoding the token")
-		}
-	}).Methods("GET")
+	router.HandleFunc("/", healthCheck)
+	router.HandleFunc("/link", sendRedirectURI).Methods("GET")
+	router.HandleFunc("/token", completeAuth).Methods("GET")
 	router.HandleFunc("/addsong", addsong).Methods("POST")
 	router.HandleFunc("/getsong", getsong).Methods("GET")
 	router.HandleFunc("/deletesong", deletesong).Methods("DELETE")
@@ -105,7 +78,6 @@ func run() {
 
 func main() {
 
-
 	run()
 
 	url := auth.AuthURL(state)
@@ -123,6 +95,7 @@ func main() {
 }
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
+
 	tok, err := auth.Token(r.Context(), state, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
@@ -138,9 +111,66 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	client := spotify.New(auth.Client(r.Context(), tok))
 	fmt.Fprintf(w, "Login Completed!")
 	ch <- client
-  http.Redirect(w, r, "http://localhost:4200", http.StatusSeeOther)
+	//http.Redirect(w, r, "http://localhost:4200", http.StatusSeeOther)
 }
 
+func healthCheck(writer http.ResponseWriter, request *http.Request) {
+	log.Println("Got request for:", request.URL.String())
+}
+
+func sendRedirectURI(writer http.ResponseWriter, request *http.Request) {
+	// Create a map to hold the response data
+	response := map[string]string{
+		"link": auth.AuthURL(state),
+	}
+	// Set the response Content-Type to application/json
+	writer.Header().Set("Content-Type", "application/json")
+	// Encode the response data as JSON and write it to the response writer
+	err := json.NewEncoder(writer).Encode(response)
+	if err != nil {
+		log.Fatalln("There was an error encoding the URI link")
+	}
+}
+
+func sendToken(writer http.ResponseWriter, request *http.Request) {
+	fmt.Println(request.URL.Query())
+	fmt.Println(("hello"))
+	tok, err := auth.Token(request.Context(), state, request)
+	if err != nil {
+		http.Error(writer, "Couldn't get token", http.StatusForbidden)
+		log.Fatal(err)
+		log.Fatal("Hello")
+
+	}
+	if st := request.FormValue("state"); st != state {
+		http.NotFound(writer, request)
+		//log.Fatalf("State mismatch: %s != %s\n", st, state)
+	}
+
+	// use the token to get an authenticated client
+	client := spotify.New(auth.Client(request.Context(), tok))
+	fmt.Fprintf(writer, "Login Completed!")
+	ch <- client
+	fmt.Println("End of complete auth reached")
+
+	// Create a map to hold the response data
+	response := map[string]*oauth2.Token{
+		"token": tok,
+	}
+	// Set the response Content-Type to application/json
+	writer.Header().Set("Content-Type", "application/json")
+	// Encode the response data as JSON and write it to the response writer
+	err = json.NewEncoder(writer).Encode(response)
+	if err != nil {
+		log.Fatalln("There was an error encoding the token")
+	}
+}
+
+/*
+	func redirect(writer http.ResponseWriter, request *http.Request) {
+		http.Redirect(writer, request, "http://localhost:4200", http.StatusSeeOther)
+	}
+*/
 func addsong(writer http.ResponseWriter, request *http.Request) {
 
 }

@@ -53,7 +53,7 @@ func run() {
 	router.HandleFunc("/callback", completeAuth)
 	router.HandleFunc("/", healthCheck)
 	router.HandleFunc("/link", sendRedirectURI).Methods("GET")
-	router.HandleFunc("/token", completeAuth).Methods("GET")
+	router.HandleFunc("/token", sendToken).Methods("GET")
 	router.HandleFunc("/addsong", addsong).Methods("POST")
 	router.HandleFunc("/getsong", getsong).Methods("GET")
 	router.HandleFunc("/deletesong", deletesong).Methods("DELETE")
@@ -166,6 +166,11 @@ func sendToken(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+/*
+	func redirect(writer http.ResponseWriter, request *http.Request) {
+		http.Redirect(writer, request, "http://localhost:4200", http.StatusSeeOther)
+	}
+*/
 /*
 	func redirect(writer http.ResponseWriter, request *http.Request) {
 		http.Redirect(writer, request, "http://localhost:4200", http.StatusSeeOther)

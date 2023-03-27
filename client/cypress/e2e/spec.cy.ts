@@ -4,5 +4,6 @@ describe('My First Test', () => {
 
     cy.contains("Login to Spotify to host a session").click()
     cy.url().should('include', 'https://open.spotify.com/?')
+
   })
 })

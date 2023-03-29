@@ -26,9 +26,17 @@
         </form>
         or
             <br>
-            <a mat-button routerLink="/host" title="Host">
+            <a mat-button routerLink="/host" title="Host" (onClick)="createSession()">
                 Host
             </a>
     </div>
+    <!-- <div class="app-example-params">
+        <h2>queryParams</h2>
+        <pre>{{ queryParams|json }}</pre>
+        <h2>code:</h2>
+        <pre>{{code}}</pre>
+        <h2>state:</h2>
+        <pre>{{state}}</pre>
+    </div> -->
 </body>
 </html>

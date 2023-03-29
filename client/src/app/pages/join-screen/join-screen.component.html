@@ -1,22 +1,27 @@
 <!DOCTYPE html>
 
+
 <html>
+
 
 <!--info about the webpage-->
 <head>
     <title>Groupify</title>
+
 
     <!--make webpage scale on mobile devices-->
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <body>
     <div class="container">
-        <h1 font><img src="assets/white-logo.png" height="30" alt="Spotify logo">Groupify</h1>
+        <h1 style="font-size: 40px;" @fadeIn><img src="assets/white-logo.png" height="40" alt="Spotify logo" @fadeIn>Groupify</h1>
 
-        <hr>
+
+        <hr style="width: 350px;" @expandWidth @fadeIn>
+
 
         <br>
-        <a mat-button href="{{loginUrl}}" title="Login to Spotify">
+        <a mat-button href="{{loginUrl}}" title="Login to Spotify" @fadeIn @expandUp>
             Login to Spotify to listen
         </a>
     </div>

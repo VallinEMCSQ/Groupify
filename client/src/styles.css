@@ -1,4 +1,10 @@
-/* You can add global styles to this file, and also import other style files */
 body, html{
     height: 100%;
+    width: 100%;
+    background-image: url(assets/papyrus-dark.webp);
+    color: white;
+}
+header{
+    background-image: url(assets/papyrus-dark.webp);
+    color: white;
 }

@@ -10,12 +10,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 </head>
 <header>
-  <h1><img src="assets/white-logo.png" alt="Logo" width="40px"/>Groupify</h1>
+  <h1 style="margin-left: 15px; font-size: 40px;"><img src="assets/white-logo.png" alt="Logo" width="40px"/>Groupify</h1>
 </header>
 <body>
   <form [formGroup]="searchForm" (ngSubmit)="onSearch()" style="margin-bottom: 15px;">
-    <input type="text" placeholder="Search songs" formControlName="search" />
-    <button ba type="submit" >Search</button>
+    <input @fadeIn @expandWidth type="text" placeholder="Search songs" formControlName="search" />
+    <button @fadeIn ba type="submit" >Search</button>
   </form>
   
   <!-- <div *ngIf="currentTrack">
@@ -23,10 +23,10 @@
     <p>{{ currentTrack.artists[0].name }}</p>
     <img [src]="currentTrack.album.images[0].url" alt="" />
    -->
-    <button mat-fab extended (click)="onPlay()">Play</button>
+    <button @expandUp @fadeIn mat-fab extended (click)="onPlay()">Play</button>
     <!-- <button (click)="onPause()">Pause</button> -->
-    <button mat-fab extended (click)="onNext()">Next</button>
-    <button mat-fab extended (click)="onPrevious()">Previous</button>
+    <button @expandUp @fadeIn mat-fab extended (click)="onNext()">Next</button>
+    <button @expandUp @fadeIn mat-fab extended (click)="onPrevious()">Previous</button>
   <!-- </div> -->
 </body>
 </html>

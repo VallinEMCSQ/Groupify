@@ -1,23 +1,13 @@
 package main
 
 import (
-<<<<<<< Updated upstream
-	//"context"
-=======
 	"context"
 	"crypto/rand"
->>>>>>> Stashed changes
 	"encoding/json"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-<<<<<<< Updated upstream
-
-	"github.com/gorilla/mux"
-	"github.com/zmb3/spotify"
-	"golang.org/x/oauth2"
-=======
 	"time"
 
 	"github.com/gorilla/mux"
@@ -29,7 +19,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
->>>>>>> Stashed changes
 )
 
 const (
@@ -38,19 +27,13 @@ const (
 )
 
 var (
+
 	auth = spotify.NewAuthenticator(
 		redirectURI,
 		spotify.ScopeUserReadPrivate,
 		spotify.ScopeUserReadEmail,
 	)
 	ch = make(chan *spotify.Client)
-<<<<<<< Updated upstream
-)
-
-func main() {
-
-	router := mux.NewRouter()
-=======
 	tok *oauth2.Token
 	//userClient spotify.Client
 	databaseClient *mongo.Client
@@ -71,11 +54,6 @@ type Song struct {
 	Duration int    `json:"Duration"`
 	//Artists []SimpleArtist      `json:"Artists"`
 }
-
-// type test_struct struct {
-//     userName string `json:"userName"`
-// 	songName string `json:"songName`
-// }
 
 func connectDatabase() {
 
@@ -109,7 +87,7 @@ func run() {
 	router.HandleFunc("/callback", completeAuth)
 	router.HandleFunc("/health-check", healthCheck)
 	router.HandleFunc("/link", sendRedirectURI).Methods("GET")
-	router.HandleFunc("/token", sendToken).Methods("GET")
+	//router.HandleFunc("/token", sendToken).Methods("GET")
 	router.HandleFunc("/create-session", createSession).Methods("GET")
 	router.HandleFunc("/addsong", addsong).Methods("POST")
 	//router.HandleFunc("/test", test).Methods("POST")
@@ -137,46 +115,32 @@ func run() {
 func main() {
 
 	connectDatabase()
->>>>>>> Stashed changes
 
+	run()
 
-	router.HandleFunc("/callback", completeAuth)
-	router.HandleFunc("/", startAuth)
+	url := auth.AuthURL(state)
+	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
 
-<<<<<<< Updated upstream
-	go http.ListenAndServe(":8080", router)
-
-	fmt.Println("Please visit http://localhost:8080 to authenticate this application.")
+	// wait for auth to complete
 	client := <-ch
 
-	user, err := client.CurrentUser()
-=======
-	// wait for auth to complete
-	userClient := <-ch
-
 	// use the client to make calls that require authorization
-	user, err := userClient.CurrentUser()
->>>>>>> Stashed changes
+	user, err := client.CurrentUser()
 	if err != nil {
-		fmt.Printf("Error getting current user: %s\n", err.Error())
-		return
+		log.Fatal(err)
 	}
-<<<<<<< Updated upstream
-
-	fmt.Printf("You are logged in as: %s\n", user.ID)
-}
-
-func startAuth(w http.ResponseWriter, r *http.Request) {
-	url := auth.AuthURL(state)
-	http.Redirect(w, r, url, http.StatusFound)
-}
-
-func completeAuth(w http.ResponseWriter, r *http.Request) {
-=======
 	fmt.Println("You are logged in as:", user.DisplayName)
+
+	forever()
 
 	disconnectDatabase()
 	
+}
+
+func forever() {
+	for {
+		select {}
+	}
 }
 
 func createSessionCode() string {
@@ -238,8 +202,6 @@ func createSession(writer http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(result.InsertedID)
 
-	//fmt.Fprintf(writer, temp)
-
 	
 	// Create a map to hold the response data
 	response := map[string]string{
@@ -257,15 +219,17 @@ func createSession(writer http.ResponseWriter, r *http.Request) {
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
 
->>>>>>> Stashed changes
 	tok, err := auth.Token(state, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
-		return
+		log.Fatal(err)
+
+	}
+	if st := r.FormValue("state"); st != state {
+		http.NotFound(w, r)
+		log.Fatalf("State mismatch: %s != %s\n", st, state)
 	}
 
-<<<<<<< Updated upstream
-=======
 	// use the token to get an authenticated client
 	client := auth.NewClient(tok)
 	fmt.Fprintf(w, "Login Completed!")
@@ -291,30 +255,7 @@ func sendRedirectURI(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-func sendToken(writer http.ResponseWriter, request *http.Request) {
-	// Create a map to hold the response data
->>>>>>> Stashed changes
-	response := map[string]*oauth2.Token{
-		"token": tok,
-	}
-
-	w.Header().Set("Content-type", "application/json")
-	err1 := json.NewEncoder(w).Encode(response)
-	if err1 != nil {
-		log.Fatalln("There was an error encoding the token")
-	}
-
-	// create a client using the specified token
-	//client := auth.NewClient(tok)
-	fmt.Fprintf(w, "Login complete!")
-	//ch <- &client
-}
-<<<<<<< Updated upstream
-=======
-
 func addsong(writer http.ResponseWriter, request *http.Request) {
-
-
 
 
 }
@@ -326,4 +267,3 @@ func getsong(writer http.ResponseWriter, request *http.Request) {
 func deletesong(writer http.ResponseWriter, request *http.Request) {
 
 }
->>>>>>> Stashed changes

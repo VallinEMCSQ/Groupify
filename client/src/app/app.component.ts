@@ -7,4 +7,8 @@ import { Component } from '@angular/core';
 })
 export class AppComponent {
   title = 'Groupify';
+
+  constructor() {
+    console.log('app component constructed')
+  }
 }

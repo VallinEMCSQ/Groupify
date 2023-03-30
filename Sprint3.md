@@ -13,7 +13,8 @@ Frontend:
     - Create the join-screen component and test that it contains the “Login to Spotify to listen” button
     - Create the player component and test that it contains the Play, Next, and Previous buttons
     - Create the start component
-Unit Tests:
+- Unit Tests:
+![image](https://user-images.githubusercontent.com/95201928/228723622-012e6c43-3516-4455-9077-44f558d157e0.png)
 
 
 

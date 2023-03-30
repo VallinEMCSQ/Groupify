@@ -239,19 +239,19 @@ func createSession(writer http.ResponseWriter, r *http.Request) {
 	users := bson.D{{Key: "userName", Value: ""}}
 	songs := bson.D{{Key: "songName", Value: ""}}
 
-	result, err := usersCollection.InsertOne(ctx, users)
+	_, err := usersCollection.InsertOne(ctx, users)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(result.InsertedID)
+	//fmt.Println(result.InsertedID)
 
-	result, err = songsCollection.InsertOne(ctx, songs)
+	_, err = songsCollection.InsertOne(ctx, songs)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	fmt.Println(result.InsertedID)
+	//fmt.Println(result.InsertedID)
 
 	// Create a map to hold the response data
 	response := map[string]string{
@@ -288,7 +288,9 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	stateNum := r.URL.Query().Get("state")
 	// get token
 	tok, err := auth.TokenFunc(r.Context(), stateNum, codeNum, r)
+	fmt.Println("here")
 	fmt.Println(tok)
+	fmt.Println("now here")
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
 		log.Fatal(err)

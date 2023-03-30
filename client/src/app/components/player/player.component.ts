@@ -1,11 +1,17 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup } from '@angular/forms';
+import { expandUp, expandWidth, fadeIn } from 'src/app/animations';
 import { SpotifyService } from '../../services/spotify.service';
 
 @Component({
   selector: 'app-player',
   templateUrl: './player.component.html',
-  styleUrls: ['./player.component.css']
+  styleUrls: ['./player.component.css'],
+  animations: [
+    fadeIn,
+    expandUp,
+    expandWidth
+  ]
 })
 export class PlayerComponent implements OnInit {
   searchForm!: FormGroup;

@@ -2,12 +2,16 @@ package main
 
 import (
 	"encoding/json"
+	//"fmt"
+	"context"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/oauth2"
+	//"golang.org/x/oauth2"
 )
 
 func TestHealthCheckHandler(t *testing.T) {
@@ -53,24 +57,32 @@ func TestSendRedirectURIHandler(t *testing.T) {
 	assert.NotEmpty(t, response["link"])
 }
 
-func TestSendTokenHandler(t *testing.T) {
-	// create a request to the token endpoint
-	req, err := http.NewRequest("GET", "/token", nil)
-	assert.NoError(t, err)
+func TestCreateSessionCode(t *testing.T) {
+	// Call the function to generate a session code
+	sessionCode := createSessionCode()
 
-	// create a response recorder to capture the response
-	rr := httptest.NewRecorder()
+	// Verify that the session code has a length of 6 characters
+	if len(sessionCode) != 6 {
+		t.Errorf("Expected session code length of 6, but got %d", len(sessionCode))
+	}
 
-	// call the handler
-	handler := http.HandlerFunc(sendToken)
-	handler.ServeHTTP(rr, req)
+	// Verify that the session code only contains characters from the "table"
+	for _, c := range sessionCode {
+		if !strings.Contains("1234567890", string(c)) {
+			t.Errorf("Session code contains invalid character: %q", c)
+		}
+	}
+}
 
-	// check the response status code
-	assert.Equal(t, http.StatusOK, rr.Code)
+func TestConnectDatabase(t *testing.T) {
+	connectDatabase()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
 
-	// check the response body
-	var response map[string]*oauth2.Token
-	err = json.Unmarshal(rr.Body.Bytes(), &response)
-	assert.NoError(t, err)
-	assert.Contains(t, response, "token")
+	err := databaseClient.Ping(ctx, nil)
+	if err != nil {
+		t.Errorf("Database connection failed: %v", err)
+	}
+
+	databaseClient.Disconnect(ctx)
 }

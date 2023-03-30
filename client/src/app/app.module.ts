@@ -1,4 +1,4 @@
-import { NgModule } from '@angular/core';
+import { Host, NgModule } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { MaterialModule } from './material/material.module';
 import {HttpClientModule} from '@angular/common/http'; 
@@ -22,7 +22,8 @@ const routes:Routes = [
     AppComponent,
     PlayerComponent,
     JoinScreenComponent,
-    StartComponent
+    StartComponent,
+    HostComponent
   ],
   imports: [
     BrowserModule,

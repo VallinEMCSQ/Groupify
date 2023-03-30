@@ -1,4 +1,4 @@
-Frontend
+Frontend:
 Page routing was set up so that the user could navigate between the login page, start page, and host page.
 A get function was written to send parameters to the back end and receive an authorization token in response, once the login authorization was complete.
 The user is successfully redirected back to the front end server after the login is complete, where the user has the option to join an existing session or host a new session
@@ -17,7 +17,7 @@ Unit Tests:
 
 
 
-Backend
+Backend:
 A database using mongoDB was set up in order to hold info regarding the user that is in a session and the songs that they want to queue.
 A new database is created for every session that is hosted with no repeat session codes being created.
 The backend is connected to the database using a connection string specific to a cluster we are using along with the current IP address of the computer accessing the cluster.

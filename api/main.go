@@ -335,16 +335,6 @@ func sendRedirectURI(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
-/*
-	func redirect(writer http.ResponseWriter, request *http.Request) {
-		http.Redirect(writer, request, "http://localhost:4200", http.StatusSeeOther)
-	}
-*/
-/*
-	func redirect(writer http.ResponseWriter, request *http.Request) {
-		http.Redirect(writer, request, "http://localhost:4200", http.StatusSeeOther)
-	}
-*/
 func addsong(writer http.ResponseWriter, request *http.Request) {
 	// read data from frontend into an object
 	writer.Header().Set("Content-Type", "application/json")

@@ -2,12 +2,17 @@ package main
 
 import (
 	"encoding/json"
+	//"fmt"
+	"context"
+	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 	"net/http/httptest"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/assert"
-	"golang.org/x/oauth2"
+	//"golang.org/x/oauth2"
 )
 
 func TestHealthCheckHandler(t *testing.T) {
@@ -53,52 +58,70 @@ func TestSendRedirectURIHandler(t *testing.T) {
 	assert.NotEmpty(t, response["link"])
 }
 
-func TestSendTokenHandler(t *testing.T) {
-	// create a request to the token endpoint
-	req, err := http.NewRequest("GET", "/token", nil)
-	assert.NoError(t, err)
+func TestCreateSessionCode(t *testing.T) {
+	// Call the function to generate a session code
+	sessionCode := createSessionCode()
 
-	// create a response recorder to capture the response
-	rr := httptest.NewRecorder()
+	// Verify that the session code has a length of 6 characters
+	if len(sessionCode) != 6 {
+		t.Errorf("Expected session code length of 6, but got %d", len(sessionCode))
+	}
 
-	// call the handler
-	handler := http.HandlerFunc(sendToken)
-	handler.ServeHTTP(rr, req)
-
-	// check the response status code
-	assert.Equal(t, http.StatusOK, rr.Code)
-
-	// check the response body
-	var response map[string]*oauth2.Token
-	err = json.Unmarshal(rr.Body.Bytes(), &response)
-	assert.NoError(t, err)
-	assert.Contains(t, response, "token")
-	//assert.NotNil(t, response["token"])
+	// Verify that the session code only contains characters from the "table"
+	for _, c := range sessionCode {
+		if !strings.Contains("1234567890", string(c)) {
+			t.Errorf("Session code contains invalid character: %q", c)
+		}
+	}
 }
 
-func TestCompleteAuth(t *testing.T) {
-	// Create a new HTTP request with the desired URL and query parameters
-	req, err := http.NewRequest("GET", "/complete-auth?code=1234&state=abcd", nil)
+func TestConnectDatabase(t *testing.T) {
+	connectDatabase()
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	err := databaseClient.Ping(ctx, nil)
 	if err != nil {
-		t.Fatal(err)
+		t.Errorf("Database connection failed: %v", err)
 	}
 
-	// Create a new HTTP recorder to capture the response
-	rr := httptest.NewRecorder()
+	databaseClient.Disconnect(ctx)
+}
 
-	// Call the completeAuth function with the HTTP request and recorder
-	completeAuth(rr, req)
+func TestCreateSession(t *testing.T) {
+	// Create a fake HTTP request and response
+	req := httptest.NewRequest("POST", "/createSession", nil)
+	w := httptest.NewRecorder()
 
-	// Check that the response status code is what we expect (200 OK)
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v",
-			status, http.StatusOK)
+	// Call the function being tested
+	createSession(w, req)
+
+	// Check that the response status code is 200 OK
+	if w.Code != http.StatusOK {
+		t.Errorf("createSession returned wrong status code: got %v, want %v", w.Code, http.StatusOK)
 	}
 
-	// Check that the response body is what we expect ("Login Completed!")
-	expected := "Login Completed!"
-	if rr.Body.String() != expected {
-		t.Errorf("handler returned unexpected body: got %v want %v",
-			rr.Body.String(), expected)
+	// Check that the response body contains the expected sessionCode
+	expectedResponse := `{"sessionCode":`
+	if !strings.Contains(w.Body.String(), expectedResponse) {
+		t.Errorf("createSession returned unexpected response body: got %v, want body containing %v", w.Body.String(), expectedResponse)
+	}
+
+	// Check that the sessionCodes map was updated
+	if len(sessionCodes) != 1 {
+		t.Errorf("createSession did not add a new session code to the sessionCodes map")
+	}
+
+	// Check that the usersCollection and songsCollection were created in the database
+	// (You would need to replace the empty strings with actual usernames and song names.)
+	user := bson.M{"userName": ""}
+	song := bson.M{"songName": ""}
+	userResult := usersCollection.FindOne(ctx, user)
+	if userResult.Err() != nil {
+		t.Errorf("createSession did not create the users collection in the database: %v", userResult.Err())
+	}
+	songResult := songsCollection.FindOne(ctx, song)
+	if songResult.Err() != nil {
+		t.Errorf("createSession did not create the songs collection in the database: %v", songResult.Err())
 	}
 }

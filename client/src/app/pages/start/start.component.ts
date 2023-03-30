@@ -27,7 +27,7 @@ export class StartComponent implements OnInit{
     // send code and state parameters to complete spotify authorization and receive access token
     this.startService.getToken(this.code, this.state).subscribe(
       response => {
-        this.authToken = response.link
+        this.authToken = response['link']
         console.log("Token received and stored: ", this.authToken)
       }
     )

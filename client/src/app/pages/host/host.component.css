@@ -1,0 +1,7 @@
+body, header, html{
+    background-color: black;
+}
+header{
+    color: whitesmoke;
+    margin-top: 5px;
+}

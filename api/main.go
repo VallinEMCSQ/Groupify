@@ -16,6 +16,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/zmb3/spotify/v2"
 
+
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -335,6 +336,7 @@ func sendRedirectURI(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+
 func addsong(writer http.ResponseWriter, request *http.Request) {
 	// read data from frontend into an object
 	writer.Header().Set("Content-Type", "application/json")
@@ -350,6 +352,7 @@ func addsong(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		log.Fatalln("There was an error encoding the initialized struct")
 	}
+
 
 }
 

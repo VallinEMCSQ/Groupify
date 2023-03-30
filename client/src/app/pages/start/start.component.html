@@ -32,9 +32,17 @@
         </form>
         <body style="height: 10px;" @fadeIn>or</body>
         <br>
-        <a mat-button title="Host" @expandUp @fadeIn>
+        <a mat-button routerLink="/host" title="Host" (click)="createSession()" @expandUp @fadeIn>
             Host
         </a>
     </div>
+    <!-- <div class="app-example-params">
+        <h2>queryParams</h2>
+        <pre>{{ queryParams|json }}</pre>
+        <h2>code:</h2>
+        <pre>{{code}}</pre>
+        <h2>state:</h2>
+        <pre>{{state}}</pre>
+    </div> -->
 </body>
 </html>

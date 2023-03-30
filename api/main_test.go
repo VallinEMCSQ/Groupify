@@ -75,3 +75,30 @@ func TestSendTokenHandler(t *testing.T) {
 	assert.Contains(t, response, "token")
 	//assert.NotNil(t, response["token"])
 }
+
+func TestCompleteAuth(t *testing.T) {
+	// Create a new HTTP request with the desired URL and query parameters
+	req, err := http.NewRequest("GET", "/complete-auth?code=1234&state=abcd", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create a new HTTP recorder to capture the response
+	rr := httptest.NewRecorder()
+
+	// Call the completeAuth function with the HTTP request and recorder
+	completeAuth(rr, req)
+
+	// Check that the response status code is what we expect (200 OK)
+	if status := rr.Code; status != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			status, http.StatusOK)
+	}
+
+	// Check that the response body is what we expect ("Login Completed!")
+	expected := "Login Completed!"
+	if rr.Body.String() != expected {
+		t.Errorf("handler returned unexpected body: got %v want %v",
+			rr.Body.String(), expected)
+	}
+}

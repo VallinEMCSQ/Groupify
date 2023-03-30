@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { ActivatedRoute } from '@angular/router';
+import { ActivatedRoute, Params } from '@angular/router';
 import { StartService } from './start.service';
 
 @Component({
@@ -11,31 +11,34 @@ export class StartComponent implements OnInit{
   code!: string;
   state!: string;
   authToken: any;
+  sessionPIN: any;
+  queryParams!: Params;
 
   constructor(private startService: StartService, private route: ActivatedRoute) {
+    // parse the query parameters from the start url and store the code and state
     this.route.queryParams.subscribe(params => {
-      this.code = params['param1'];
-      this.state = params['param2'];
-    });
-    console.log("Code: ", this.code);
-    console.log("State: ", this.state);
+      this.queryParams = params;
+    })
+    this.code = this.queryParams['code'];
+    this.state = this.queryParams['state'];
   }
 
   ngOnInit(): void {
-    // send a post to backend containing the code and state from the url query parameters
-    this.startService.sendAuthParams(this.code, this.state).subscribe(
-      (response: any) => {
-        this.authToken = response.link
-        console.log("Token received and stored: ", this.authToken)
-      }
-    )
-    // complete spotify authorization and receive access token
-    this.startService.getToken().subscribe(
+    // send code and state parameters to complete spotify authorization and receive access token
+    this.startService.getToken(this.code, this.state).subscribe(
       response => {
         this.authToken = response.link
         console.log("Token received and stored: ", this.authToken)
       }
     )
   }
-
+  // store the unique session PIN that backend creates when the Host button is clicked
+  createSession(): void {
+    this.startService.createSession().subscribe(
+      response => {
+        this.sessionPIN = response.sessionCode
+        console.log("Session created. PIN: ", this.sessionPIN)
+      }
+    )
+  }
 }

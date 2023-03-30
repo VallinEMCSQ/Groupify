@@ -1,0 +1,18 @@
+.container {
+  margin: auto;
+    width: 50%;
+    border: 3px solid white;
+    padding: 10px;
+    text-align: center;
+    /* display: flex;
+    justify-content: center;
+    align-items: center;*/ 
+} 
+body, header, html{
+    background-color: black;
+    color: white;
+}
+button, a{
+    background-color: #1DB954;
+    margin: 3px;
+}

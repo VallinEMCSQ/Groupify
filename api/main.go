@@ -288,6 +288,7 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	stateNum := r.URL.Query().Get("state")
 	// get token
 	tok, err := auth.TokenFunc(r.Context(), stateNum, codeNum, r)
+	fmt.Println(tok)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
 		log.Fatal(err)
@@ -314,7 +315,6 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	client := spotify.New(auth.Client(r.Context(), tok))
 	fmt.Fprintf(w, "Login Completed!")
 	ch <- client
-
 }
 
 func healthCheck(writer http.ResponseWriter, request *http.Request) {
@@ -335,6 +335,16 @@ func sendRedirectURI(writer http.ResponseWriter, request *http.Request) {
 	}
 }
 
+/*
+	func redirect(writer http.ResponseWriter, request *http.Request) {
+		http.Redirect(writer, request, "http://localhost:4200", http.StatusSeeOther)
+	}
+*/
+/*
+	func redirect(writer http.ResponseWriter, request *http.Request) {
+		http.Redirect(writer, request, "http://localhost:4200", http.StatusSeeOther)
+	}
+*/
 func addsong(writer http.ResponseWriter, request *http.Request) {
 	// read data from frontend into an object
 	writer.Header().Set("Content-Type", "application/json")

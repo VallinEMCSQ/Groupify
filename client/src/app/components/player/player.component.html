@@ -1,1 +1,29 @@
-<p>player works!</p>
+<!DOCTYPE html>
+
+<html>
+
+<!--info about the webpage-->
+<head>
+    <title>Groupify</title>
+
+    <!--make webpage scale on mobile devices-->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <form [formGroup]="searchForm" (ngSubmit)="onSearch()" style="margin-bottom: 15px;">
+    <input type="text" placeholder="Search songs" formControlName="search" />
+    <button ba type="submit" >Search</button>
+  </form>
+  
+  <!-- <div *ngIf="currentTrack">
+    <h2>{{ currentTrack.name }}</h2>
+    <p>{{ currentTrack.artists[0].name }}</p>
+    <img [src]="currentTrack.album.images[0].url" alt="" />
+   -->
+    <button mat-fab extended (click)="onPlay()">Play</button>
+    <!-- <button (click)="onPause()">Pause</button> -->
+    <button mat-fab extended (click)="onNext()">Next</button>
+    <button mat-fab extended (click)="onPrevious()">Previous</button>
+  <!-- </div> -->
+</body>
+</html>

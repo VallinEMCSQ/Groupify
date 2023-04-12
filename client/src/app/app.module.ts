@@ -3,6 +3,8 @@ import { BrowserModule } from '@angular/platform-browser';
 import { MaterialModule } from './material/material.module';
 import {HttpClientModule} from '@angular/common/http'; 
 import { FormsModule,ReactiveFormsModule } from '@angular/forms';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
+
 
 import { AppComponent } from './app.component';
 import { PlayerComponent } from './components/player/player.component';
@@ -26,6 +28,7 @@ const routes:Routes = [
     HostComponent
   ],
   imports: [
+    BrowserAnimationsModule,
     BrowserModule,
     MaterialModule,
     HttpClientModule,

@@ -32,7 +32,7 @@
         </form>
         <body style="height: 10px;" @fadeIn>or</body>
         <br>
-        <a mat-button routerLink="/host" title="Host" @expandUp @fadeIn>
+        <a mat-button routerLink="/host" title="Host" (click)="createSession()" @expandUp @fadeIn>
             Host
         </a>
     </div>

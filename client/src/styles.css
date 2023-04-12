@@ -8,3 +8,6 @@ header{
     background-image: url(assets/papyrus-dark.webp);
     color: white;
 }
+hr{
+    text-align: center;
+}

@@ -2,8 +2,11 @@ package main
 
 import (
 	"context"
+	"crypto/rand"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"os"
@@ -13,6 +16,7 @@ import (
 	"github.com/rs/cors"
 	"github.com/zmb3/spotify/v2"
 
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
@@ -179,11 +183,112 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("You are logged in as:", user.DisplayName)
+
+	forever()
+
+	disconnectDatabase()
+}
+
+func forever() {
+	for {
+		select {}
+	}
+}
+
+func createSessionCode() string {
+	b := make([]byte, 6)
+	n, err := io.ReadAtLeast(rand.Reader, b, 6)
+	if n != 6 {
+		panic(err)
+	}
+	for i := 0; i < len(b); i++ {
+		b[i] = table[int(b[i])%len(table)]
+	}
+
+	return string(b)
+}
+
+func createSession(writer http.ResponseWriter, r *http.Request) {
+
+	var repeat bool = false
+	var cont bool = true
+	var temp string
+
+	for cont {
+		repeat = false
+		temp = createSessionCode()
+
+		for key := range sessionCodes {
+			if key == temp {
+				repeat = true
+			}
+		}
+
+		if repeat {
+			cont = true
+		} else {
+			break
+		}
+	}
+
+	sessionCodes[temp] = "0"
+
+	usersCollection = databaseClient.Database(temp).Collection("users")
+	songsCollection = databaseClient.Database(temp).Collection("songs")
+
+	users := bson.D{{Key: "userName", Value: ""}}
+	songs := bson.D{{Key: "songName", Value: ""}}
+
+	result, err := usersCollection.InsertOne(ctx, users)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(result.InsertedID)
+
+	result, err = songsCollection.InsertOne(ctx, songs)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println(result.InsertedID)
+
+	// Create a map to hold the response data
+	response := map[string]string{
+		"sessionCode": temp,
+	}
+	// Set the response Content-Type to application/json
+	writer.Header().Set("Content-Type", "application/json")
+	// Encode the response data as JSON and write it to the response writer
+	err = json.NewEncoder(writer).Encode(response)
+	if err != nil {
+		log.Fatalln("There was an error encoding the token")
+	}
+
+}
+
+func (a Authenticator) TokenFunc(ctx context.Context, actualState string, code string, r *http.Request, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
+	/*if e := values.Get("error"); e != "" {
+		return nil, errors.New("spotify: auth failed - " + e)
+	}*/
+	//code := values.Get("code")
+	if code == "" {
+		return nil, errors.New("spotify: didn't get access code")
+	}
+	//actualState := values.Get("state")
+	if state != actualState {
+		return nil, errors.New("spotify: redirect state parameter doesn't match")
+	}
+	return a.config.Exchange(ctx, code, opts...)
 }
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
-
-	tok, err := auth.Token(r.Context(), state, r)
+	//read in parameters from front end
+	codeNum := r.URL.Query().Get("code")
+	stateNum := r.URL.Query().Get("state")
+	fmt.Println(codeNum)
+	// get token
+	tok, err := auth.TokenFunc(r.Context(), stateNum, codeNum, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
 		log.Fatal(err)
@@ -210,7 +315,7 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	client := spotify.New(auth.Client(r.Context(), tok))
 	fmt.Fprintf(w, "Login Completed!")
 	ch <- client
-	//http.Redirect(w, r, "http://localhost:4200", http.StatusSeeOther)
+
 }
 
 func healthCheck(writer http.ResponseWriter, request *http.Request) {

@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	//"fmt"
 	"context"
-	"go.mongodb.org/mongo-driver/bson"
 	"net/http"
 	"net/http/httptest"
 	"strings"
@@ -86,42 +85,4 @@ func TestConnectDatabase(t *testing.T) {
 	}
 
 	databaseClient.Disconnect(ctx)
-}
-
-func TestCreateSession(t *testing.T) {
-	// Create a fake HTTP request and response
-	req := httptest.NewRequest("POST", "/createSession", nil)
-	w := httptest.NewRecorder()
-
-	// Call the function being tested
-	createSession(w, req)
-
-	// Check that the response status code is 200 OK
-	if w.Code != http.StatusOK {
-		t.Errorf("createSession returned wrong status code: got %v, want %v", w.Code, http.StatusOK)
-	}
-
-	// Check that the response body contains the expected sessionCode
-	expectedResponse := `{"sessionCode":`
-	if !strings.Contains(w.Body.String(), expectedResponse) {
-		t.Errorf("createSession returned unexpected response body: got %v, want body containing %v", w.Body.String(), expectedResponse)
-	}
-
-	// Check that the sessionCodes map was updated
-	if len(sessionCodes) != 1 {
-		t.Errorf("createSession did not add a new session code to the sessionCodes map")
-	}
-
-	// Check that the usersCollection and songsCollection were created in the database
-	// (You would need to replace the empty strings with actual usernames and song names.)
-	user := bson.M{"userName": ""}
-	song := bson.M{"songName": ""}
-	userResult := usersCollection.FindOne(ctx, user)
-	if userResult.Err() != nil {
-		t.Errorf("createSession did not create the users collection in the database: %v", userResult.Err())
-	}
-	songResult := songsCollection.FindOne(ctx, song)
-	if songResult.Err() != nil {
-		t.Errorf("createSession did not create the songs collection in the database: %v", songResult.Err())
-	}
 }

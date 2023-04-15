@@ -1,9 +1,9 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject } from 'rxjs';
-import { JoinScreenService } from './join-screen.service';
-
+import { BehaviorSubject, Observable } from 'rxjs';
+import { StartComponent } from '../pages/start/start.component';
 declare var Spotify: any;
-
+// TO RUN W/O BACKEND TOKEN: Paste token from Spotify Developers (only lasts one hour)
+const token = "BQDHASvGTKsUYuN9OSBsrPXs_fM_O73hHwdxtqT44kdcW59nGxsUNN0LJHtY553hRu8ic8bI_gnP4saJ0GUbNvo6O2evqp4wGQB0mTq51U9jTXvynC1n7CzDxSvac-yuRgXF-zRpfUv3gam4rDDqZqcivX4iqkg4tT_hu2SbvAQH4zm-H14nkhXfHB-U9DbdVbv8"
 @Injectable({
   providedIn: 'root'
 })
@@ -15,13 +15,13 @@ export class SpotifyService {
   player_state_interval:any;
   devices:any;
   devicesForm:any;
+  player_ready = new BehaviorSubject<boolean>(false);
 
   is_paused = false;
   is_active = false;
 
-  constructor(private _joinScreenService: JoinScreenService){
+  constructor(private startComponent: StartComponent){
     this.device_id = '';
-    console.log('player component constructed');
   }
 
   public initializePlayer() {
@@ -44,20 +44,6 @@ export class SpotifyService {
       console.log(arg);
       console.log("Script loaded");
     })
-
-    // this.loadPlayerState();
-
-    // this.player_state_interval = setInterval(() => {
-    //   this.loadPlayerState()
-    // }, 5000);
-
-    // let initial_values = {
-    //   device:['', Validators.required]
-    // }
-
-    // this.devicesForm = this.formBuilder.group(initial_values)
-
-    // this.getAvailableDevices();
   }
 
   ngOnDestroy(){
@@ -76,8 +62,10 @@ export class SpotifyService {
   }
 
   connectPlayer(){
-    // const token = this._joinScreenService.getAuthUrl();
-    const token = 'BQCyxw3XhOd5Cagj2-zr6KqvhC-hwhPl9XRA1SHMgV2F_5u92sg9cwbQQfzVCq-OFNUpplFpC-k_5lRoDNXRS9pi-IQ_v8becwQppGXl6hzRVQYyUAEPhTxDPgMABLXS_TH8JesFTAC8HPSbZTHueUFKIzzmTUW2FcEeJNrNeK7f5QawhkVOWbN_I73E5XleTg';
+    // gets token stored in the start component, which is acquired through a get request upon start's initialization
+    // const token = this.startComponent.authToken;
+    // console.log("Token: ", this.startComponent.authToken);
+    // const token = "BQAbEuMli8V2_shKcfFG9ySC1yNxLMonnKV3Sxea7WWXQOu7GX0CxJqwgNHrNSJPddfEoLWZfGyf04TbIu-XKWjeS08nNT6TGuotNdyJr33rKxKhFyx9DvXtlaPkRalJMYvopqax6zbW5XPSGpEllkdZEsMqZpFw9Ppa-xg4Hsigcz7_2MPhS37TngSz5bvhpa1e"
     this.player = new Spotify.Player({
       name: 'Web Playback SDK Quick Start Player',
       getOAuthToken: (cb:any) => { cb(token); },
@@ -87,8 +75,15 @@ export class SpotifyService {
     console.log(this.player);
     console.log("onSpotifyWebPlaybackSDKReady");
 
-    // ready listener
-      this.player.addListener('ready', this.ready.bind(this));
+    // // ready listener
+    //   this.player.addListener('ready', this.ready.bind(this));
+
+    // When the player is ready, set the playerReady BehaviorSubject to true
+      this.player.addListener('ready', () => {
+        console.log('Spotify Player ready');
+        this.ready.bind(this);
+        this.onPlayerReady();
+      });
 
     // not_ready listener
       this.player.addListener('not_ready', this.not_ready.bind(this));
@@ -106,6 +101,8 @@ export class SpotifyService {
 
     // playback_error listener
       this.player.addListener('playback_error', this.playback_error.bind(this));
+
+      this.player.addListener('player_state_changed', this.loadPlayerState.bind(this));
 
     this.player.connect().then((success:any) => {
       console.log(success);
@@ -128,6 +125,14 @@ export class SpotifyService {
   ready(device_id:string){
     this.device_id = device_id;
     console.log("ready Listener");
+  }
+
+  public isPlayerReady(): Observable<boolean> {
+    return this.player_ready.asObservable();
+  }
+  
+  private onPlayerReady() {
+    this.player_ready.next(true);
   }
 
   not_ready(device_id:string){
@@ -156,10 +161,11 @@ export class SpotifyService {
     console.log(message);
   }
 
-  getCurrentState(){
-    this.player.getCurrentState().then((state:any) => {
-      console.log("Current State: ", state);
-    })
+// called every time player state changes
+  loadPlayerState(){
+    // player_state is a BehaviorSubject that emits its latest value to the subscriber in PlayerComponent
+    // every time loadPlayerState() is called, player_state is fed a new current state value
+    this.player_state.next(this.player.getCurrentState());
   }
 
   togglePlay(){
@@ -195,13 +201,6 @@ export class SpotifyService {
   //   console.log("decrementing volumne by 1%")
   // }
 
-  // loadPlayerState(){
-  //   this.spotify.perform("endpoint-get-information-about-the-users-current-playback").subscribe(
-  //     (player:any) => {
-  //       console.log(player);
-  //       this.player_state = player;
-  //     }
-  //   )
 
   // }
 

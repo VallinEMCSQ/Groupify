@@ -14,7 +14,10 @@ export class StartService {
   getToken(code: string, state: string): Observable<any> {
     console.log("start.service: Getting token through http request")
     return this.http.get('http://localhost:8080/callback', {
-
+      params: {
+        code: code,
+        state: state
+      }
     })
   }
   // backend creates a new session PIN, stores it in the db, and returns the PIN

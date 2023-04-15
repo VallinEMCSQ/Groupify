@@ -289,6 +289,8 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	//read in parameters from front end
 	codeNum := r.URL.Query().Get("code")
 	stateNum := r.URL.Query().Get("state")
+	fmt.Println("codeNum: ", codeNum)
+	fmt.Println("stateNum: ", stateNum)
 	// get token
 	tok, err := auth.TokenFunc(r.Context(), stateNum, codeNum, r)
 	if err != nil {

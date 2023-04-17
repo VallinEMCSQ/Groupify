@@ -15,15 +15,14 @@
     <button @fadeIn ba type="submit" >Search</button>
   </form>
   
-  <!-- <div *ngIf="currentTrack">
+  <div *ngIf="currentTrack">
     <h2>{{ currentTrack.name }}</h2>
     <p>{{ currentTrack.artists[0].name }}</p>
     <img [src]="currentTrack.album.images[0].url" alt="" />
-   -->
+  </div>
     <button @expandUp @fadeIn mat-fab extended (click)="onPlay()">Play</button>
     <!-- <button (click)="onPause()">Pause</button> -->
     <button @expandUp @fadeIn mat-fab extended (click)="onNext()">Next</button>
     <button @expandUp @fadeIn mat-fab extended (click)="onPrevious()">Previous</button>
-  <!-- </div> -->
 </body>
 </html>

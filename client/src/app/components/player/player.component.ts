@@ -17,7 +17,7 @@ export class PlayerComponent implements OnInit {
   searchForm!: FormGroup;
   currentTrack: any;
 
-  constructor(private formBuilder: FormBuilder, private spotifyService: SpotifyService) {}
+  constructor(private formBuilder: FormBuilder, private spotifyService: SpotifyService) { }
 
   ngOnInit() {
     this.searchForm = this.formBuilder.group({
@@ -26,12 +26,28 @@ export class PlayerComponent implements OnInit {
 
     this.spotifyService.initializePlayer();
 
-    // this.spotifyService.getPlayerState().subscribe((state) => {
-    //   if (state) {
-    //     this.currentTrack = state.track_window.current_track;
-    //   }
-    // });
+
+    // Check if the player is ready before subscribing to player_state
+    const checkPlayerInterval = setInterval(() => {
+      if (this.spotifyService.isPlayerReady()) {
+        clearInterval(checkPlayerInterval);
+        this.spotifyService.player_state.subscribe((observer: any) => {
+          // for some reason, subscribing to the observable returns a ZoneAwarePromise
+          // so just resolve the promise to get the player state which contains current_track
+          if (observer) {
+            observer.then((state: any) => {
+              this.currentTrack = state.track_window.current_track
+              console.log("Current track: ", this.currentTrack.name)
+            });
+          }
+          else {
+            console.log("Null player state.")
+          }
+        });
+      }
+    }, 1000);
   }
+
 
   onSearch() {
     const searchTerm = this.searchForm.controls['search'].value;
@@ -48,9 +64,9 @@ export class PlayerComponent implements OnInit {
     // }
   }
 
-//   onPause() {
-//     this.spotifyService.pause();
-//   }
+  //   onPause() {
+  //     this.spotifyService.pause();
+  //   }
 
   onNext() {
     this.spotifyService.next();

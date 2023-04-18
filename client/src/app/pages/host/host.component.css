@@ -5,3 +5,9 @@ header{
     color: whitesmoke;
     margin-top: 5px;
 }
+.session-pin {
+    margin: auto;
+      width: 50%;
+      padding: 10px;
+      text-align: center;
+  } 

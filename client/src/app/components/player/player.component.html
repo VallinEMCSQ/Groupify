@@ -15,10 +15,10 @@
     <button @fadeIn ba type="submit" >Search</button>
   </form>
   
-  <div *ngIf="currentTrack">
-    <h2>{{ currentTrack.name }}</h2>
-    <p>{{ currentTrack.artists[0].name }}</p>
-    <img [src]="currentTrack.album.images[0].url" alt="" />
+  <div *ngIf="current_track">
+    <h2>{{ current_track.name }}</h2>
+    <p>{{ current_track.artists[0].name }}</p>
+    <img [src]="current_track.album.images[0].url" alt="" />
   </div>
     <button @expandUp @fadeIn mat-fab extended (click)="onPlay()">Play</button>
     <!-- <button (click)="onPause()">Pause</button> -->

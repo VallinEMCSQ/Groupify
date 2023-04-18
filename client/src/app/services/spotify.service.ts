@@ -3,7 +3,7 @@ import { BehaviorSubject, Observable } from 'rxjs';
 import { StartComponent } from '../pages/start/start.component';
 declare var Spotify: any;
 // TO RUN W/O BACKEND TOKEN: Paste token from Spotify Developers (only lasts one hour)
-const token = "BQDHASvGTKsUYuN9OSBsrPXs_fM_O73hHwdxtqT44kdcW59nGxsUNN0LJHtY553hRu8ic8bI_gnP4saJ0GUbNvo6O2evqp4wGQB0mTq51U9jTXvynC1n7CzDxSvac-yuRgXF-zRpfUv3gam4rDDqZqcivX4iqkg4tT_hu2SbvAQH4zm-H14nkhXfHB-U9DbdVbv8"
+const token = "BQD1F4GaOgEr9nqzsvnz00RkNqSoV-_elDR0s47DwVxyMF2GejTGsFwo0h0UXb-gpm5mUGnrXvbmfH5lkr7vXwEGQWpI_nkpiEPYff88FuArT_nGmo78p4NXkq9KuGBPDfY_kgP7KPEE4LPiQLwHxgE2BsFzCeps87yb2iO5cA1TMIcaAwpkPVFgD62pS1xizsfJ"
 @Injectable({
   providedIn: 'root'
 })

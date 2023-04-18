@@ -350,7 +350,11 @@ func addsong(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		log.Fatalln("There was an error decoding the request body into the struct")
 	}
-	// DO: store object into the database
+	// store object into the database
+	_, err = usersCollection.InsertOne(context.TODO(), &song)
+	if err != nil {
+		log.Fatalln("Error Inserting Document", err)
+	}
 	// encode object back to frontend
 	err = json.NewEncoder(writer).Encode(&song)
 	if err != nil {
@@ -361,9 +365,23 @@ func addsong(writer http.ResponseWriter, request *http.Request) {
 }
 
 func getsong(writer http.ResponseWriter, request *http.Request) {
-
+	writer.Header().Set("Content-Type", "application/json")
+	name := mux.Vars(request)["name"]
+	var result bson.M
+	if err := songsCollection.FindOne(ctx, bson.M{"name": name}).Decode(&result); err != nil {
+		panic(err)
+	}
+	err := json.NewEncoder(writer).Encode(&result)
+	if err != nil {
+		log.Fatalln("There was an error encoding the initialized struct")
+	}
 }
 
 func deletesong(writer http.ResponseWriter, request *http.Request) {
-
+	writer.Header().Set("Content-Type", "application/json")
+	name := mux.Vars(request)["name"]
+	_, err:= songsCollection.DeleteOne(context.TODO(), bson.M{"name": name})
+	if err != nil {
+		panic(err)
+	}
 }

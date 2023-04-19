@@ -202,7 +202,7 @@ func search(writer http.ResponseWriter, r *http.Request) {
 	var songs []map[string]string
 	Name := r.URL.Query().Get("Name")
 
-	res, err := client.Search(Name, spotify.SearchTypeTrack | spotify.SearchTypeArtist)
+	res, err := client.Search(context.Background(), Name, spotify.SearchTypeTrack | spotify.SearchTypeArtist)
 	if (err != nil) {
 		fmt.Println("Error searching: ", err)
 	}

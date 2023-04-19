@@ -12,6 +12,7 @@ import { JoinScreenComponent } from './pages/join-screen/join-screen.component';
 import { RouterModule, Routes } from '@angular/router';
 import { StartComponent } from './pages/start/start.component';
 import { HostComponent } from './pages/host/host.component';
+import { MatCardModule } from '@angular/material/card';
 
 
 const routes:Routes = [
@@ -30,6 +31,7 @@ const routes:Routes = [
   imports: [
     BrowserAnimationsModule,
     BrowserModule,
+    MatCardModule,
     MaterialModule,
     HttpClientModule,
     FormsModule,

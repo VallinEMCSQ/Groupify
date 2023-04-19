@@ -1,9 +1,14 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { StartComponent } from '../pages/start/start.component';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
 declare var Spotify: any;
 // TO RUN W/O BACKEND TOKEN: Paste token from Spotify Developers (only lasts one hour)
+<<<<<<< Updated upstream
 const token = "BQDogKiYGgzrfsvjM0QJdhwdYxG7N84VQ4waZYtiBxTcwRzlw7bIN1SXErgl3KprAZDfUWA5remZoRLdNYY2h4id1ZgZtgRLK6yVVvZJNYz8QAE51Oa7W0FLGqo0jIeEqWAPC3NqVTOTIf2t6UAb-t7LilR7gLVzrAIla6jiyYwuyKMPl1vFrh9cyOfxCK7WdYbQOp5GqYSOaaTYo_vGAowfbJ5QR53ZyIEuSMGEKezlbu8R7bv9xXE-HhS5jnNWNc6q9QGQO88aiy-vjZF5kLwZFBMGp1iOE5VGs4_5XrzcWrKeKeRairTH-s3kyd3iOf1M_bp4v4p3A_UrbHcZ6MLzJWGFJBkJMYM1WC9kav8mEbI"
+=======
+const token = "BQCehqAc_rkLjDxq3wBB9N0KJ3dhUaT19CvAkY_667yHVJX8gAG1S8K3QxYTiuriXLg5KHSU6h4qVzTdP1kpSTAKxTCW82l4wFZ2-Sq-HMGQMP8I7eKwM4hm1GpvVe0d2wAHytHgtzbPJiGqDTAeYMkVVO693fryA7vdf0DAHIHO8Jk6qR7SMfZVYREfSqf3Acxg"
+>>>>>>> Stashed changes
 @Injectable({
   providedIn: 'root'
 })
@@ -20,7 +25,7 @@ export class SpotifyService {
   is_paused = false;
   is_active = false;
 
-  constructor(private startComponent: StartComponent){
+  constructor(private startComponent: StartComponent, private http: HttpClient){
     this.device_id = '';
   }
 
@@ -79,11 +84,7 @@ export class SpotifyService {
     //   this.player.addListener('ready', this.ready.bind(this));
 
     // When the player is ready, set the playerReady BehaviorSubject to true
-      this.player.addListener('ready', () => {
-        console.log('Spotify Player ready');
-        this.ready.bind(this);
-        this.onPlayerReady();
-      });
+      this.player.addListener('ready', this.ready.bind(this));
 
     // not_ready listener
       this.player.addListener('not_ready', this.not_ready.bind(this));
@@ -125,14 +126,11 @@ export class SpotifyService {
   ready(device_id:string){
     this.device_id = device_id;
     console.log("ready Listener");
+    this.player_ready.next(true);
   }
 
   public isPlayerReady(): Observable<boolean> {
     return this.player_ready.asObservable();
-  }
-  
-  private onPlayerReady() {
-    this.player_ready.next(true);
   }
 
   not_ready(device_id:string){
@@ -192,40 +190,25 @@ export class SpotifyService {
       })
 
   }
+  
+  public getQuery(query: string) {
+    // define common url
+    const url: string = `https://api.spotify.com/v1/${query}`;
 
-  // incrementVolume(){
-  //   console.log("Incrementing volume by 1%")
-  // }
+    // define header to specify token
+    const headers = new HttpHeaders({
+      'Authorization': 'Bearer BQCSb1ivRY-Tdtc8ZxRcXSX3kSJn8LkfRHe1rsqm0Q8mviy3Kzxw_2ZFkvc8xsMIvHt1skBImaZqj9aVTpa0D-SzzYCCSKyzXVC11skN6GK7xjv7tcpk_cueicWFPYvZcnAyZqkLUScLb9qu-nb1vSYwf7JYxc8chkrdGQKSBu9ILoY17hFu8d5JrfZl9wf-jEBm'
+    });
+    // execute request
+    return this.http.get(url, { headers });
+  }
 
-  // decrementVolume(){
-  //   console.log("decrementing volumne by 1%")
-  // }
-
-
-  // }
-
-  // getSongProgress(){
-  //   if(!this.player_state){
-  //     return 0;
-  //   }else{
-  //     let percent = Math.trunc((this.player_state.progress_ms/this.player_state.item.duration_ms) * 100);
-
-  //     if(!Number.isNaN(percent)){
-  //       return percent;
-  //     }else{
-  //       return 0;
-  //     }
-  //   }
-  // }
-
-  // getAvailableDevices(){
-  //   this.spotify.perform("endpoint-get-a-users-available-devices").subscribe(
-  //     {
-  //       next: (devices:any) => {
-  //         this.devices = devices.devices;
-  //         console.log(this.devices);
-  //       }
-  //     }
-  //   )
-  // }
+  // backend calls search endpoint with the search term provided and returns list of tracks
+  search(term: string) {
+    return this.http.get('http://localhost:8080/search', {
+      params: {
+        Name: term
+      }
+    })
+  }
 }

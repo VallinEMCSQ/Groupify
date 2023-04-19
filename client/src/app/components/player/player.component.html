@@ -14,14 +14,35 @@
     <input @fadeIn @expandWidth type="text" placeholder="Search songs" formControlName="search" />
     <button @fadeIn ba type="submit" >Search</button>
   </form>
+<<<<<<< Updated upstream
   
   <div *ngIf="currentTrack">
     <h2>{{ currentTrack.name }}</h2>
     <p>{{ currentTrack.artists[0].name }}</p>
     <img [src]="currentTrack.album.images[0].url" alt="" />
+=======
+
+  <div *ngFor="let track of searchResults">
+    {{track.name}}
+>>>>>>> Stashed changes
   </div>
+  <!-- <div class="search-section__input-container">
+    <input class="search-section__input" type="text" id="inputSearch" placeholder="Search artist or track" (keyup)="search(searchTerm.value)" (keydown.backspace)="search(searchTerm.value)" #searchTerm>
+  </div> -->
+
+  <div class="current-track" *ngIf="current_track">
+    <mat-card class="current-track"> 
+      <mat-card-header style="padding: 20px;">
+        <mat-card-title-group>
+          <img mat-card-sm-image [src]="current_track.album.images[0].url" alt="" />
+          <mat-card-title>{{ current_track.name }}</mat-card-title>
+          <mat-card-subtitle>{{ current_track.artists[0].name }}</mat-card-subtitle>
+        </mat-card-title-group>
+      </mat-card-header>
+    </mat-card>
+  </div>
+
     <button @expandUp @fadeIn mat-fab extended (click)="onPlay()">Play</button>
-    <!-- <button (click)="onPause()">Pause</button> -->
     <button @expandUp @fadeIn mat-fab extended (click)="onNext()">Next</button>
     <button @expandUp @fadeIn mat-fab extended (click)="onPrevious()">Previous</button>
 </body>

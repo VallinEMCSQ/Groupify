@@ -97,6 +97,33 @@ func (a Authenticator) Client(ctx context.Context, token *oauth2.Token) *http.Cl
 	return a.config.Client(ctx, token)
 }
 
+<<<<<<< Updated upstream
+=======
+var (
+	auth            = New(WithRedirectURL(redirectURI))
+	ch              = make(chan *spotify.Client)
+	state           = "abc123"
+	databaseClient  *mongo.Client
+	err             error
+	songsCollection *mongo.Collection
+	usersCollection *mongo.Collection
+	ctx             context.Context
+	table           = [...]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
+	sessionCodes    = make(map[string]string)
+	client *spotify.Client
+)
+
+type Person struct {
+	Username string `json:"username,omitempty" bson:"username, omitempty"`
+	ID       string `json:"age,omitempty" bson:"age,omitempty"`
+}
+type Song struct {
+	Name     string `json:"name,omitempty" bson:"name,omitempty"`
+	Duration int    `json:"duration,omitempty" bson:"duration,omitempty"`
+	//Artists []SimpleArtist      `json:"Artists"`
+}
+
+>>>>>>> Stashed changes
 func connectDatabase() {
 
 	// creates a client object to connect to the databse using a username, password, and url specific to the cluster
@@ -134,7 +161,10 @@ func run() {
 	router.HandleFunc("/getsong", getsong).Methods("GET")
 	router.HandleFunc("/deletesong", deletesong).Methods("DELETE")
 	router.HandleFunc("/search", search).Methods("GET")
+<<<<<<< Updated upstream
 
+=======
+>>>>>>> Stashed changes
 
 	// Create a new cors middleware instance with desired options
 	c := cors.New(cors.Options{
@@ -186,17 +216,24 @@ func forever() {
 }
 
 func search(writer http.ResponseWriter, r *http.Request) {
+<<<<<<< Updated upstream
 	writer.Header().Set("Content-Type", "application/json")
 	var songs []map[string]string
 	Name := r.URL.Query().Get("Name")
 
 	res, err := client.Search(Name, spotify.SearchTypeTrack | spotify.SearchTypeArtist)
+=======
+	Name := r.URL.Query().Get("Name")
+
+	res, err := client.Search(context.Background(), Name, spotify.SearchTypeTrack | spotify.SearchTypeArtist)
+>>>>>>> Stashed changes
 	if (err != nil) {
 		fmt.Println("Error searching: ", err)
 	}
 	if res.Tracks != nil {
 		fmt.Println("Tracks:")
 		for _, item := range res.Tracks.Tracks {
+<<<<<<< Updated upstream
 			songs = append(songs, map[string]string{"Song Name: " + item.Name + " Artist: " + item.Artists[0].Name: item.LinkedFrom.URI,})
 			//fmt.Println(" ", item.Name, item.Artists[0].Name)
 		}
@@ -207,10 +244,20 @@ func search(writer http.ResponseWriter, r *http.Request) {
 		}
 	}
 	err2 := json.NewEncoder(writer).Encode(&songs)
+=======
+			fmt.Println(" ", item.Name, item.Artists[0].Name)
+		}
+	}
+	err2 := json.NewEncoder(writer).Encode(&res)
+>>>>>>> Stashed changes
 	if err2 != nil {
 		log.Fatalln("There was an error encoding the search")
 	}
 }
+<<<<<<< Updated upstream
+=======
+
+>>>>>>> Stashed changes
 func createSessionCode() string {
 	b := make([]byte, 6)
     n, err := io.ReadAtLeast(rand.Reader, b, 6)
@@ -376,7 +423,6 @@ func addsong(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		log.Fatalln("There was an error encoding the initialized struct")
 	}
-
 
 }
 

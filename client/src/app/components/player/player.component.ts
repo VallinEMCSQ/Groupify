@@ -15,7 +15,13 @@ import { SpotifyService } from '../../services/spotify.service';
 })
 export class PlayerComponent implements OnInit {
   searchForm!: FormGroup;
+<<<<<<< Updated upstream
   currentTrack: any;
+=======
+  current_track: any;
+  queue: any;
+  searchResults: any;
+>>>>>>> Stashed changes
 
   constructor(private formBuilder: FormBuilder, private spotifyService: SpotifyService) { }
 
@@ -23,9 +29,6 @@ export class PlayerComponent implements OnInit {
     this.searchForm = this.formBuilder.group({
       search: '',
     });
-
-    this.spotifyService.initializePlayer();
-
 
     // Check if the player is ready before subscribing to player_state
     const checkPlayerInterval = setInterval(() => {
@@ -46,6 +49,9 @@ export class PlayerComponent implements OnInit {
         });
       }
     }, 1000);
+
+    // this.getQueue();
+    // console.log("Queue:", this.queue)
   }
 
 
@@ -55,6 +61,11 @@ export class PlayerComponent implements OnInit {
 
     // Call the Spotify API to search for tracks with the given search term
     // and display the results in the template
+    this.spotifyService.search(searchTerm).subscribe((tracks: any) => {
+      this.searchResults = tracks.tracks.items;
+      console.log("Tracks: ", tracks.tracks.items)
+    })
+    console.log("Results: ", this.searchResults)
   }
 
   onPlay() {
@@ -64,9 +75,6 @@ export class PlayerComponent implements OnInit {
     // }
   }
 
-  //   onPause() {
-  //     this.spotifyService.pause();
-  //   }
 
   onNext() {
     this.spotifyService.next();
@@ -74,5 +82,16 @@ export class PlayerComponent implements OnInit {
 
   onPrevious() {
     this.spotifyService.previous();
+  }
+
+  // getQueue() {
+  //   const endpoint = "me/player/queue";
+  //   this.spotifyService.getQuery(endpoint).subscribe((queue: any) => {
+  //     this.queue = queue;
+  //   });
+  // }
+
+  addToQueue() {
+
   }
 }

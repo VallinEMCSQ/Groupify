@@ -6,4 +6,7 @@ button{
     color: white;
     margin: 3px;
 }
-
+.current-track {
+    max-width: 400px;
+    margin-bottom: 8px;
+  }

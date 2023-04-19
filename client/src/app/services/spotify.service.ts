@@ -4,7 +4,7 @@ import { StartComponent } from '../pages/start/start.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 declare var Spotify: any;
 // TO RUN W/O BACKEND TOKEN: Paste token from Spotify Developers (only lasts one hour)
-const token = "BQAxR4YN5askhfrYBTN62KX651rTM3jjUDIQJoR0ICMnFlrdktqIduxm6vVvZc18EPTWf9G9-e6QCdRJrR7OFRxHg8vJhuJhvA2XJT3mkIqNSvfyuFYp_GzygO0Yny10P87nN9FQE0BPSzTXyjMDwfhUcs8KdzGO2qWpETm07Y5UQG4dPKeMAT6f6fVxeuOmRY32"
+const token = "BQDWO6YqirvAVICGk9_VqFWpeRvePl4LrCOYT5qbu-h_vlqdmreycLGwQEpQQAwVtk_ANgAz82S-2ywjQc6vm8nS8elzk2P_jlIZqt8VDYXGwbSyXDYUShLsm47FfX4yNiYNwZdM_tFr8jcWcir8ubCTXDZ3DVc4AV5EhjeQBdQUFzEgT0ToZSrl2nL2cIFBh0wS"
 @Injectable({
   providedIn: 'root'
 })
@@ -121,7 +121,7 @@ export class SpotifyService {
 
   ready(device_id:string){
     this.device_id = device_id;
-    console.log("ready Listener");
+    console.log("Ready Device: ", this.device_id);
     this.player_ready.next(true);
   }
 
@@ -205,6 +205,14 @@ export class SpotifyService {
       params: {
         Name: term
       }
+    })
+  }
+
+  addToQueue(track_id: string){
+    console.log("POST request: { track_id: ", track_id, ", device_id:", this.device_id, "}")
+    return this.http.post('http://localhost:8080/add-queue', {
+      track_id: track_id,
+      device_id: this.device_id
     })
   }
 }

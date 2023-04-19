@@ -22,7 +22,7 @@
     <input class="search-section__input" type="text" id="inputSearch" placeholder="Search artist or track" (keyup)="search(searchTerm.value)" (keydown.backspace)="search(searchTerm.value)" #searchTerm>
   </div> -->
 
-  <div class="current-track" *ngIf="current_track">
+  <div class="current-track" *ngIf="current_track" style="display: table; margin: 0 auto;">
     <mat-card class="current-track"> 
       <mat-card-header style="padding: 20px;">
         <mat-card-title-group>

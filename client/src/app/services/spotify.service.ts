@@ -4,11 +4,7 @@ import { StartComponent } from '../pages/start/start.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 declare var Spotify: any;
 // TO RUN W/O BACKEND TOKEN: Paste token from Spotify Developers (only lasts one hour)
-<<<<<<< Updated upstream
-const token = "BQDogKiYGgzrfsvjM0QJdhwdYxG7N84VQ4waZYtiBxTcwRzlw7bIN1SXErgl3KprAZDfUWA5remZoRLdNYY2h4id1ZgZtgRLK6yVVvZJNYz8QAE51Oa7W0FLGqo0jIeEqWAPC3NqVTOTIf2t6UAb-t7LilR7gLVzrAIla6jiyYwuyKMPl1vFrh9cyOfxCK7WdYbQOp5GqYSOaaTYo_vGAowfbJ5QR53ZyIEuSMGEKezlbu8R7bv9xXE-HhS5jnNWNc6q9QGQO88aiy-vjZF5kLwZFBMGp1iOE5VGs4_5XrzcWrKeKeRairTH-s3kyd3iOf1M_bp4v4p3A_UrbHcZ6MLzJWGFJBkJMYM1WC9kav8mEbI"
-=======
-const token = "BQCehqAc_rkLjDxq3wBB9N0KJ3dhUaT19CvAkY_667yHVJX8gAG1S8K3QxYTiuriXLg5KHSU6h4qVzTdP1kpSTAKxTCW82l4wFZ2-Sq-HMGQMP8I7eKwM4hm1GpvVe0d2wAHytHgtzbPJiGqDTAeYMkVVO693fryA7vdf0DAHIHO8Jk6qR7SMfZVYREfSqf3Acxg"
->>>>>>> Stashed changes
+const token = "BQAxR4YN5askhfrYBTN62KX651rTM3jjUDIQJoR0ICMnFlrdktqIduxm6vVvZc18EPTWf9G9-e6QCdRJrR7OFRxHg8vJhuJhvA2XJT3mkIqNSvfyuFYp_GzygO0Yny10P87nN9FQE0BPSzTXyjMDwfhUcs8KdzGO2qWpETm07Y5UQG4dPKeMAT6f6fVxeuOmRY32"
 @Injectable({
   providedIn: 'root'
 })

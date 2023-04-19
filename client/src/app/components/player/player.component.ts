@@ -15,13 +15,9 @@ import { SpotifyService } from '../../services/spotify.service';
 })
 export class PlayerComponent implements OnInit {
   searchForm!: FormGroup;
-<<<<<<< Updated upstream
-  currentTrack: any;
-=======
   current_track: any;
   queue: any;
   searchResults: any;
->>>>>>> Stashed changes
 
   constructor(private formBuilder: FormBuilder, private spotifyService: SpotifyService) { }
 
@@ -39,8 +35,8 @@ export class PlayerComponent implements OnInit {
           // so just resolve the promise to get the player state which contains current_track
           if (observer) {
             observer.then((state: any) => {
-              this.currentTrack = state.track_window.current_track
-              console.log("Current track: ", this.currentTrack.name)
+              this.current_track = state.track_window.current_track
+              console.log("Current track: ", this.current_track.name)
             });
           }
           else {
@@ -65,7 +61,6 @@ export class PlayerComponent implements OnInit {
       this.searchResults = tracks.tracks.items;
       console.log("Tracks: ", tracks.tracks.items)
     })
-    console.log("Results: ", this.searchResults)
   }
 
   onPlay() {

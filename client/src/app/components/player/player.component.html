@@ -14,17 +14,9 @@
     <input @fadeIn @expandWidth type="text" placeholder="Search songs" formControlName="search" />
     <button @fadeIn ba type="submit" >Search</button>
   </form>
-<<<<<<< Updated upstream
-  
-  <div *ngIf="currentTrack">
-    <h2>{{ currentTrack.name }}</h2>
-    <p>{{ currentTrack.artists[0].name }}</p>
-    <img [src]="currentTrack.album.images[0].url" alt="" />
-=======
 
   <div *ngFor="let track of searchResults">
     {{track.name}}
->>>>>>> Stashed changes
   </div>
   <!-- <div class="search-section__input-container">
     <input class="search-section__input" type="text" id="inputSearch" placeholder="Search artist or track" (keyup)="search(searchTerm.value)" (keydown.backspace)="search(searchTerm.value)" #searchTerm>

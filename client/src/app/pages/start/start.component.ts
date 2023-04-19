@@ -18,7 +18,6 @@ export class StartComponent implements OnInit{
   code!: string;
   state!: string;
   authToken: any;
-  sessionPIN: any;
   queryParams!: Params;
 
   constructor(private startService: StartService, private route: ActivatedRoute) {
@@ -40,13 +39,5 @@ export class StartComponent implements OnInit{
       }
     )
   }
-  // store the unique session PIN that backend creates when the Host button is clicked
-  createSession(): void {
-    this.startService.createSession().subscribe(
-      response => {
-        this.sessionPIN = response.sessionCode
-        console.log("Session created. PIN: ", this.sessionPIN)
-      }
-    )
-  }
+
 }

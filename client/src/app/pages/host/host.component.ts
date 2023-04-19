@@ -1,9 +1,6 @@
 import { Component } from '@angular/core';
-<<<<<<< Updated upstream
-=======
 import { StartService } from '../start/start.service';
 import { SpotifyService } from 'src/app/services/spotify.service';
->>>>>>> Stashed changes
 
 @Component({
   selector: 'app-host',
@@ -11,9 +8,8 @@ import { SpotifyService } from 'src/app/services/spotify.service';
   styleUrls: ['./host.component.css']
 })
 export class HostComponent {
+  sessionPIN: any;
 
-<<<<<<< Updated upstream
-=======
   constructor(private startService: StartService, private spotifyService: SpotifyService) {
     this.createSession();
 
@@ -30,5 +26,4 @@ export class HostComponent {
       }
     )
   }
->>>>>>> Stashed changes
 }

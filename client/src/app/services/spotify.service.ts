@@ -4,7 +4,7 @@ import { StartComponent } from '../pages/start/start.component';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 declare var Spotify: any;
 // TO RUN W/O BACKEND TOKEN: Paste token from Spotify Developers (only lasts one hour)
-const token = "BQDWO6YqirvAVICGk9_VqFWpeRvePl4LrCOYT5qbu-h_vlqdmreycLGwQEpQQAwVtk_ANgAz82S-2ywjQc6vm8nS8elzk2P_jlIZqt8VDYXGwbSyXDYUShLsm47FfX4yNiYNwZdM_tFr8jcWcir8ubCTXDZ3DVc4AV5EhjeQBdQUFzEgT0ToZSrl2nL2cIFBh0wS"
+const token = "BQAoBpv46D1UzbLKsWp5ML071E6-1rm6bDNS6Gz1RfsBACBU29bNPyMCdKlAu51e46Zy0j0Z96LHS-2aRqsf7j_VjKAgQGsLd680mrIkCdAEmQ6CRuBVDzqkaMzIo0QhxS7vcRU0HWcspXQ-DzEf_-7l0gMDseBEbrwuIwWIp_WH2M5LcGlR-iim76vud_1rgJ58ynnXPQUrx8Xbaf7Ri1RYagQ8WOBmagffVc5khADDr1oyEn_0RyNRkKHanxgntzkRm3qHhIF4krs2dTNyxrucVFI3NjKHTPsfCMwfNsQvD48l4s-Atz-xfeWQPRWVwp6dz0Wt0C6iVcnU3panhTfxNKfFo8GrArmFY5NB0wO67LM"
 @Injectable({
   providedIn: 'root'
 })

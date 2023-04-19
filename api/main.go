@@ -418,13 +418,13 @@ func deletesong(writer http.ResponseWriter, request *http.Request) {
 
 func addQueue(w http.ResponseWriter, r *http.Request) {
 	ctx := r.Context()
-	fmt.Println("r.Context():", r.Context())
 	w.Header().Set("Content-Type", "application/json")
-	var ID spotify.ID
-	err := json.NewDecoder(r.Body).Decode(&ID)
-	fmt.Println("ID:", ID)
-	if err != nil {
-		log.Fatalln("There was an error decoding track id")
-	}
-	client.QueueSong(ctx, ID)
+	// var ID spotify.ID
+	// err := json.NewDecoder(r.Body).Decode(&ID)
+	// if err != nil {
+	// 	log.Fatalln("There was an error decoding track id")
+	// }
+	trackID := (spotify.ID)(mux.Vars(r)["track_id"])
+	//deviceID := (*spotify.PlayOptions)(mux.Vars(r)["device_id"])
+	client.QueueSong(ctx, trackID)
 }

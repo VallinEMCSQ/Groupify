@@ -7,7 +7,7 @@ button{
     margin: 3px;
 }
 .current-track {
-    width: 400px;
+    max-width: 400px;
 }
 div{
     display: flex;

@@ -98,6 +98,7 @@ var (
 	ctx             context.Context
 	table           = [...]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
 	sessionCodes    = make(map[string]string)
+	client *spotify.Client
 )
 
 type Person struct {
@@ -108,9 +109,6 @@ type Song struct {
 	Name     string `json:"name,omitempty" bson:"name,omitempty"`
 	Duration int    `json:"duration,omitempty" bson:"duration,omitempty"`
 	//Artists []SimpleArtist      `json:"Artists"`
-}
-type authInfo struct {
-	Code string `json:"code"`
 }
 
 func connectDatabase() {
@@ -178,7 +176,7 @@ func main() {
 	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
 
 	// wait for auth to complete
-	client := <-ch
+	client = <-ch
 
 	// use the client to make calls that require authorization
 	user, err := client.CurrentUser(context.Background())
@@ -186,6 +184,17 @@ func main() {
 		log.Fatal(err)
 	}
 	fmt.Println("You are logged in as:", user.DisplayName)
+
+	res, err := client.Search(context.Background(), "Animals", spotify.SearchTypeTrack)
+	if (err != nil) {
+		fmt.Println("Error searching: ", err)
+	}
+	if res.Tracks != nil {
+		fmt.Println("Tracks:")
+		for _, item := range res.Tracks.Tracks {
+			fmt.Println("  ", item.Name)
+		}
+	}
 
 	forever()
 
@@ -345,7 +354,7 @@ func addsong(writer http.ResponseWriter, request *http.Request) {
 	// read data from frontend into an object
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
-	var song Song
+	var song Song 
 	err := json.NewDecoder(request.Body).Decode(&song)
 	if err != nil {
 		log.Fatalln("There was an error decoding the request body into the struct")

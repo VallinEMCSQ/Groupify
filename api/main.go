@@ -87,8 +87,14 @@ func (a Authenticator) Client(ctx context.Context, token *oauth2.Token) *http.Cl
 	return a.config.Client(ctx, token)
 }
 
+func WithScopes(scopes ...string) AuthenticatorOption {
+	return func(a *Authenticator) {
+		a.config.Scopes = scopes
+	}
+}
+
 var (
-	auth            = New(WithRedirectURL(redirectURI))
+	auth            = New(WithRedirectURL(redirectURI), WithScopes("user-modify-playback-state", "user-read-playback-state"))
 	ch              = make(chan *spotify.Client)
 	state           = "abc123"
 	databaseClient  *mongo.Client
@@ -148,6 +154,7 @@ func run() {
 	router.HandleFunc("/getsong", getsong).Methods("GET")
 	router.HandleFunc("/deletesong", deletesong).Methods("DELETE")
 	router.HandleFunc("/search", search).Methods("GET")
+	router.HandleFunc("/add-queue", addQueue).Methods("POST")
 
 	// Create a new cors middleware instance with desired options
 	c := cors.New(cors.Options{
@@ -210,8 +217,12 @@ func search(writer http.ResponseWriter, r *http.Request) {
 		for _, item := range res.Tracks.Tracks {
 			fmt.Println(" ", item.Name, item.Artists[0].Name)
 		}
-		}
-		
+		// for _, item := range songs {
+		// 	for k, v := range item {
+		// 		fmt.Println(k, " URI: ", v)
+		// 	}
+		// }
+	}
 	err2 := json.NewEncoder(writer).Encode(&res)
 	if err2 != nil {
 		log.Fatalln("There was an error encoding the search")
@@ -403,4 +414,15 @@ func deletesong(writer http.ResponseWriter, request *http.Request) {
 	if err != nil {
 		panic(err)
 	}
+}
+
+func addQueue(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+	w.Header().Set("Content-Type", "application/json")
+	var ID spotify.ID
+	err := json.NewDecoder(r.Body).Decode(&ID)
+	if err != nil {
+		log.Fatalln("There was an error decoding track id")
+	}
+	client.QueueSong(ctx, ID)
 }

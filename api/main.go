@@ -4,29 +4,49 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/json"
-	"errors"
+
+	//"errors"
 	"fmt"
 	"io"
 	"log"
 	"net/http"
-	"os"
 	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/rs/cors"
-	"github.com/zmb3/spotify/v2"
+	"github.com/zmb3/spotify"
 
+	"golang.org/x/oauth2"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
-	"golang.org/x/oauth2"
-	/*"go.mongodb.org/mongo-driver/mongo"
-	  "go.mongodb.org/mongo-driver/mongo/options"
-	  "go.mongodb.org/mongo-driver/mongo/readpref"*/)
+)
 
-const redirectURI = "http://localhost:4200/start"
+const (
+	redirectURI = "http://localhost:4200/start"
+	state       = "abc123" // a random state value for security
+)
+
+var (
+
+	auth = spotify.NewAuthenticator(
+		redirectURI,
+		spotify.ScopeUserReadPrivate,
+		spotify.ScopeUserReadEmail,
+	)
+	ch = make(chan *spotify.Client)
+	tok *oauth2.Token
+	client *spotify.Client
+	databaseClient *mongo.Client
+	err error
+	songsCollection *mongo.Collection
+	usersCollection *mongo.Collection
+	ctx context.Context
+	table = [...]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
+	sessionCodes = make(map[string]string)
+)
 
 type Authenticator struct {
 	config *oauth2.Config
@@ -34,8 +54,19 @@ type Authenticator struct {
 
 type AuthenticatorOption func(a *Authenticator)
 
-// WithClientID allows a client ID to be specified. Without this the value of the SPOTIFY_ID environment
-// variable will be used.
+type Person struct {
+	Username string `json:"username,omitempty" bson:"username, omitempty"`
+	ID       string `json:"age,omitempty" bson:"age, omitempty"`
+}
+type Song struct {
+	Name     string `json:"name" bson:"name, omitempty"`
+	Duration int    `json:"Duration" bson:"duration, omitempty"`
+}
+
+type authInfo struct {
+	Code string `json:"code"`
+}
+
 func WithClientID(id string) AuthenticatorOption {
 	return func(a *Authenticator) {
 		a.config.ClientID = id
@@ -54,27 +85,6 @@ func WithRedirectURL(url string) AuthenticatorOption {
 	}
 }
 
-func New(opts ...AuthenticatorOption) *Authenticator {
-	cfg := &oauth2.Config{
-		ClientID:     os.Getenv("SPOTIFY_ID"),
-		ClientSecret: os.Getenv("SPOTIFY_SECRET"),
-		Endpoint: oauth2.Endpoint{
-			AuthURL:  "https://accounts.spotify.com/authorize",
-			TokenURL: "https://accounts.spotify.com/api/token",
-		},
-	}
-
-	a := &Authenticator{
-		config: cfg,
-	}
-
-	for _, opt := range opts {
-		opt(a)
-	}
-
-	return a
-}
-
 func (a Authenticator) Exchange(ctx context.Context, code string, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
 	return a.config.Exchange(ctx, code, opts...)
 }
@@ -87,36 +97,10 @@ func (a Authenticator) Client(ctx context.Context, token *oauth2.Token) *http.Cl
 	return a.config.Client(ctx, token)
 }
 
-var (
-	auth            = New(WithRedirectURL(redirectURI))
-	ch              = make(chan *spotify.Client)
-	state           = "abc123"
-	databaseClient  *mongo.Client
-	err             error
-	songsCollection *mongo.Collection
-	usersCollection *mongo.Collection
-	ctx             context.Context
-	table           = [...]byte{'1', '2', '3', '4', '5', '6', '7', '8', '9', '0'}
-	sessionCodes    = make(map[string]string)
-)
-
-type Person struct {
-	Username string `json:"username,omitempty" bson:"username, omitempty"`
-	ID       string `json:"age,omitempty" bson:"age,omitempty"`
-}
-type Song struct {
-	Name     string `json:"name,omitempty" bson:"name,omitempty"`
-	Duration int    `json:"duration,omitempty" bson:"duration,omitempty"`
-	//Artists []SimpleArtist      `json:"Artists"`
-}
-type authInfo struct {
-	Code string `json:"code"`
-}
-
 func connectDatabase() {
 
 	// creates a client object to connect to the databse using a username, password, and url specific to the cluster
-	databaseClient, err = mongo.NewClient(options.Client().ApplyURI("mongodb+srv://clarksamuel:27G4Jkg6bWjhswT7@cluster0.xsc8ntw.mongodb.net/?retryWrites=true&w=majority"))
+	databaseClient,err = mongo.NewClient(options.Client().ApplyURI("mongodb+srv://clarksamuel:27G4Jkg6bWjhswT7@cluster0.xsc8ntw.mongodb.net/?retryWrites=true&w=majority"))
 	// Error checking
 	if err != nil {
 		log.Fatal(err)
@@ -142,13 +126,15 @@ func run() {
 	router := mux.NewRouter()
 
 	// handle functions
-	router.HandleFunc("/callback", completeAuth).Methods("GET")
-	router.HandleFunc("/", healthCheck)
+	router.HandleFunc("/callback", completeAuth)
+	router.HandleFunc("/health-check", healthCheck)
 	router.HandleFunc("/link", sendRedirectURI).Methods("GET")
 	router.HandleFunc("/create-session", createSession).Methods("GET")
 	router.HandleFunc("/addsong", addsong).Methods("POST")
 	router.HandleFunc("/getsong", getsong).Methods("GET")
 	router.HandleFunc("/deletesong", deletesong).Methods("DELETE")
+	router.HandleFunc("/search", search).Methods("GET")
+
 
 	// Create a new cors middleware instance with desired options
 	c := cors.New(cors.Options{
@@ -174,14 +160,14 @@ func main() {
 
 	run()
 
-	url := auth.AuthURL(state)
-	fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
+	//url := auth.AuthURL(state)
+	//fmt.Println("Please log in to Spotify by visiting the following page in your browser:", url)
 
 	// wait for auth to complete
-	client := <-ch
+	client = <-ch
 
 	// use the client to make calls that require authorization
-	user, err := client.CurrentUser(context.Background())
+	user, err := client.CurrentUser()
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -190,6 +176,7 @@ func main() {
 	forever()
 
 	disconnectDatabase()
+	
 }
 
 func forever() {
@@ -198,18 +185,34 @@ func forever() {
 	}
 }
 
+func search(writer http.ResponseWriter, r *http.Request) {
+	Name := r.URL.Query().Get("Name")
+
+	res, err := client.Search(Name, spotify.SearchTypeTrack | spotify.SearchTypeArtist)
+	if (err != nil) {
+		fmt.Println("Error searching: ", err)
+	}
+	if res.Tracks != nil {
+		fmt.Println("Tracks:")
+		for _, item := range res.Tracks.Tracks {
+			fmt.Println(" ", item.Name, item.Artists[0].Name)
+		}
+	}
+}
+
 func createSessionCode() string {
 	b := make([]byte, 6)
-	n, err := io.ReadAtLeast(rand.Reader, b, 6)
-	if n != 6 {
-		panic(err)
-	}
-	for i := 0; i < len(b); i++ {
-		b[i] = table[int(b[i])%len(table)]
-	}
+    n, err := io.ReadAtLeast(rand.Reader, b, 6)
+    if n != 6 {
+        panic(err)
+    }
+    for i := 0; i < len(b); i++ {
+        b[i] = table[int(b[i])%len(table)]
+    }
 
 	return string(b)
 }
+
 
 func createSession(writer http.ResponseWriter, r *http.Request) {
 
@@ -227,7 +230,7 @@ func createSession(writer http.ResponseWriter, r *http.Request) {
 			}
 		}
 
-		if repeat {
+		if (repeat) {
 			cont = true
 		} else {
 			break
@@ -256,6 +259,7 @@ func createSession(writer http.ResponseWriter, r *http.Request) {
 
 	fmt.Println(result.InsertedID)
 
+	
 	// Create a map to hold the response data
 	response := map[string]string{
 		"sessionCode": temp,
@@ -270,10 +274,12 @@ func createSession(writer http.ResponseWriter, r *http.Request) {
 
 }
 
+/*
 func (a Authenticator) TokenFunc(ctx context.Context, actualState string, code string, r *http.Request, opts ...oauth2.AuthCodeOption) (*oauth2.Token, error) {
-	/*if e := values.Get("error"); e != "" {
+	/*values := r.URL.Query()
+	if e := values.Get("error"); e != "" {
 		return nil, errors.New("spotify: auth failed - " + e)
-	}*/
+	}
 	//code := values.Get("code")
 	if code == "" {
 		return nil, errors.New("spotify: didn't get access code")
@@ -284,15 +290,14 @@ func (a Authenticator) TokenFunc(ctx context.Context, actualState string, code s
 	}
 	return a.config.Exchange(ctx, code, opts...)
 }
+*/
 
 func completeAuth(w http.ResponseWriter, r *http.Request) {
 	//read in parameters from front end
-	codeNum := r.URL.Query().Get("code")
-	stateNum := r.URL.Query().Get("state")
-	fmt.Println("codeNum: ", codeNum)
-	fmt.Println("stateNum: ", stateNum)
+	//codeNum := r.URL.Query().Get("code")
+	//stateNum := r.URL.Query().Get("state")
 	// get token
-	tok, err := auth.TokenFunc(r.Context(), stateNum, codeNum, r)
+	tok, err := auth.Token(state, r)
 	if err != nil {
 		http.Error(w, "Couldn't get token", http.StatusForbidden)
 		log.Fatal(err)
@@ -316,11 +321,33 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// use the token to get an authenticated client
-	client := spotify.New(auth.Client(r.Context(), tok))
+	client := auth.NewClient(tok)
 	fmt.Fprintf(w, "Login Completed!")
-	ch <- client
+	ch <- &client
 
 }
+
+/*
+func completeAuth(w http.ResponseWriter, r *http.Request) {
+
+	tok, err := auth.Token(state, r)
+	if err != nil {
+		http.Error(w, "Couldn't get token", http.StatusForbidden)
+		log.Fatal(err)
+
+	}
+	if st := r.FormValue("state"); st != state {
+		http.NotFound(w, r)
+		log.Fatalf("State mismatch: %s != %s\n", st, state)
+	}
+
+	// use the token to get an authenticated client
+	client := auth.NewClient(tok)
+	fmt.Fprintf(w, "Login Completed!")
+	ch <- &client
+	//http.Redirect(w, r, "http://localhost:4200", http.StatusSeeOther)
+}
+*/
 
 func healthCheck(writer http.ResponseWriter, request *http.Request) {
 	log.Println("Got request for:", request.URL.String())

@@ -147,6 +147,7 @@ func run() {
 	router.HandleFunc("/addsong", addsong).Methods("POST")
 	router.HandleFunc("/getsong", getsong).Methods("GET")
 	router.HandleFunc("/deletesong", deletesong).Methods("DELETE")
+	router.HandleFunc("/search", search).Methods("GET")
 
 	// Create a new cors middleware instance with desired options
 	c := cors.New(cors.Options{
@@ -185,17 +186,6 @@ func main() {
 	}
 	fmt.Println("You are logged in as:", user.DisplayName)
 
-	res, err := client.Search(context.Background(), "Animals", spotify.SearchTypeTrack)
-	if (err != nil) {
-		fmt.Println("Error searching: ", err)
-	}
-	if res.Tracks != nil {
-		fmt.Println("Tracks:")
-		for _, item := range res.Tracks.Tracks {
-			fmt.Println("  ", item.Name)
-		}
-	}
-
 	forever()
 
 	disconnectDatabase()
@@ -204,6 +194,33 @@ func main() {
 func forever() {
 	for {
 		select {}
+	}
+}
+
+func search(writer http.ResponseWriter, r *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	var songs []map[string]string
+	Name := r.URL.Query().Get("Name")
+
+	res, err := client.Search(Name, spotify.SearchTypeTrack | spotify.SearchTypeArtist)
+	if (err != nil) {
+		fmt.Println("Error searching: ", err)
+	}
+	if res.Tracks != nil {
+		fmt.Println("Tracks:")
+		for _, item := range res.Tracks.Tracks {
+			songs = append(songs, map[string]string{"Song Name: " + item.Name + " Artist: " + item.Artists[0].Name: item.LinkedFrom.URI,})
+			//fmt.Println(" ", item.Name, item.Artists[0].Name)
+		}
+		for _, item := range songs {
+			for k, v := range item {
+				fmt.Println(k, " URI: ", v)
+			}
+		}
+	}
+	err2 := json.NewEncoder(writer).Encode(&songs)
+	if err2 != nil {
+		log.Fatalln("There was an error encoding the search")
 	}
 }
 
@@ -354,25 +371,42 @@ func addsong(writer http.ResponseWriter, request *http.Request) {
 	// read data from frontend into an object
 	writer.Header().Set("Content-Type", "application/json")
 	writer.WriteHeader(http.StatusOK)
-	var song Song 
+	var song Song
 	err := json.NewDecoder(request.Body).Decode(&song)
 	if err != nil {
 		log.Fatalln("There was an error decoding the request body into the struct")
 	}
-	// DO: store object into the database
+	// store object into the database
+	_, err = usersCollection.InsertOne(context.TODO(), &song)
+	if err != nil {
+		log.Fatalln("Error Inserting Document", err)
+	}
 	// encode object back to frontend
 	err = json.NewEncoder(writer).Encode(&song)
 	if err != nil {
 		log.Fatalln("There was an error encoding the initialized struct")
 	}
 
-
 }
 
 func getsong(writer http.ResponseWriter, request *http.Request) {
-
+	writer.Header().Set("Content-Type", "application/json")
+	name := mux.Vars(request)["name"]
+	var result bson.M
+	if err := songsCollection.FindOne(ctx, bson.M{"name": name}).Decode(&result); err != nil {
+		panic(err)
+	}
+	err := json.NewEncoder(writer).Encode(&result)
+	if err != nil {
+		log.Fatalln("There was an error encoding the initialized struct")
+	}
 }
 
 func deletesong(writer http.ResponseWriter, request *http.Request) {
-
+	writer.Header().Set("Content-Type", "application/json")
+	name := mux.Vars(request)["name"]
+	_, err:= songsCollection.DeleteOne(context.TODO(), bson.M{"name": name})
+	if err != nil {
+		panic(err)
+	}
 }

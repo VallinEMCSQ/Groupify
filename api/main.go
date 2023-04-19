@@ -186,6 +186,8 @@ func forever() {
 }
 
 func search(writer http.ResponseWriter, r *http.Request) {
+	writer.Header().Set("Content-Type", "application/json")
+	var songs []map[string]string
 	Name := r.URL.Query().Get("Name")
 
 	res, err := client.Search(Name, spotify.SearchTypeTrack | spotify.SearchTypeArtist)
@@ -195,11 +197,20 @@ func search(writer http.ResponseWriter, r *http.Request) {
 	if res.Tracks != nil {
 		fmt.Println("Tracks:")
 		for _, item := range res.Tracks.Tracks {
-			fmt.Println(" ", item.Name, item.Artists[0].Name)
+			songs = append(songs, map[string]string{"Song Name: " + item.Name + " Artist: " + item.Artists[0].Name: item.LinkedFrom.URI,})
+			//fmt.Println(" ", item.Name, item.Artists[0].Name)
+		}
+		for _, item := range songs {
+			for k, v := range item {
+				fmt.Println(k, " URI: ", v)
+			}
 		}
 	}
+	err2 := json.NewEncoder(writer).Encode(&songs)
+	if err2 != nil {
+		log.Fatalln("There was an error encoding the search")
+	}
 }
-
 func createSessionCode() string {
 	b := make([]byte, 6)
     n, err := io.ReadAtLeast(rand.Reader, b, 6)
@@ -326,28 +337,6 @@ func completeAuth(w http.ResponseWriter, r *http.Request) {
 	ch <- &client
 
 }
-
-/*
-func completeAuth(w http.ResponseWriter, r *http.Request) {
-
-	tok, err := auth.Token(state, r)
-	if err != nil {
-		http.Error(w, "Couldn't get token", http.StatusForbidden)
-		log.Fatal(err)
-
-	}
-	if st := r.FormValue("state"); st != state {
-		http.NotFound(w, r)
-		log.Fatalf("State mismatch: %s != %s\n", st, state)
-	}
-
-	// use the token to get an authenticated client
-	client := auth.NewClient(tok)
-	fmt.Fprintf(w, "Login Completed!")
-	ch <- &client
-	//http.Redirect(w, r, "http://localhost:4200", http.StatusSeeOther)
-}
-*/
 
 func healthCheck(writer http.ResponseWriter, request *http.Request) {
 	log.Println("Got request for:", request.URL.String())

@@ -22,9 +22,28 @@ To download Golang, visit
 
 `ng add @angular/material`
 
+Lastly, you need to make a account as a spotify developer in order to have the __WEB SDK__ and __Spotify API__ work properly. Vist the the Spotify for developers web page [here](https://developer.spotify.com/) and follow the steps below:
+
+1. Head to the dashboard and create an app with the name of your liking.
+
+2. While in the app, naviate to the settings tab and make sure to add these two Redirect URIs: 
+
+       http://localhost:8080/callback
+       http://localhost:4200/start
+
+and make sure to save. Once this is done, you can continue to running the programs.
+
 ## Running
 
+In order to run, you need to have the go server running as well as the Angular server. In order to start the go server, navigate to the `API` folder and run the command
 
+`go run main.go`
+
+After in a serparate CLI, navigate to the `CLIENT` folder and run the following command
+
+`ng serve --o`
+
+Wait a little bit for the Angular server to boot up and you should be at a login screen for the Groupify site. Continue to log in using your regular spotify account login and you will be able to use the groupify site and host session in order to play music.
 
 ## Authentication
 

@@ -18,6 +18,10 @@ import { TestBed } from '@angular/core/testing';
 import { BehaviorSubject } from 'rxjs';
 import { JoinScreenService } from './join-screen.service';
 import { SpotifyService } from './spotify.service';
+import { StartComponent } from '../pages/start/start.component';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { ActivatedRoute } from '@angular/router';
+import { RouterTestingModule } from '@angular/router/testing';
 
 describe('SpotifyService', () => {
   let service: SpotifyService;
@@ -27,7 +31,10 @@ describe('SpotifyService', () => {
     const spy = jasmine.createSpyObj('JoinScreenService', ['getAuthUrl']);
 
     TestBed.configureTestingModule({
+      declarations: [StartComponent],
+      imports: [HttpClientTestingModule, RouterTestingModule],
       providers: [
+        StartComponent,
         SpotifyService,
         { provide: JoinScreenService, useValue: spy }
       ]

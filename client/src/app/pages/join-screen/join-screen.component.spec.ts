@@ -28,6 +28,8 @@ import { of } from 'rxjs';
 
 import { JoinScreenComponent, Login } from './join-screen.component';
 import { JoinScreenService } from '../../services/join-screen.service';
+import { NO_ERRORS_SCHEMA } from '@angular/core';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
 describe('JoinScreenComponent', () => {
   let component: JoinScreenComponent;
@@ -37,8 +39,9 @@ describe('JoinScreenComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ JoinScreenComponent ],
-      imports: [ HttpClientTestingModule ],
-      providers: [ JoinScreenService ]
+      imports: [ HttpClientTestingModule, BrowserAnimationsModule ],
+      providers: [ JoinScreenService ],
+      schemas: [ NO_ERRORS_SCHEMA ]
     })
     .compileComponents();
   });

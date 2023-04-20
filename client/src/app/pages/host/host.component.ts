@@ -11,7 +11,7 @@ export class HostComponent {
   sessionPIN: any;
 
   constructor(private startService: StartService, private spotifyService: SpotifyService) {
-    // this.createSession();
+    this.createSession();
 
     // only initialize the player on the host page
     // the join page will just add songs to that player using the device id in spotifyService

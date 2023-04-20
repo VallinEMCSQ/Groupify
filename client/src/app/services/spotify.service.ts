@@ -121,7 +121,7 @@ export class SpotifyService {
 
   ready(device_id:string){
     this.device_id = device_id;
-    console.log("ready Listener");
+    console.log("Ready Device: ", this.device_id);
     this.player_ready.next(true);
   }
 
@@ -205,6 +205,14 @@ export class SpotifyService {
       params: {
         Name: term
       }
+    })
+  }
+
+  addToQueue(track_id: string){
+    console.log("POST request: { track_id: ", track_id, ", device_id:", this.device_id, "}")
+    return this.http.post('http://localhost:8080/add-queue', {
+      track_id: track_id,
+      device_id: this.device_id
     })
   }
 }

@@ -86,7 +86,10 @@ export class PlayerComponent implements OnInit {
   //   });
   // }
 
-  addToQueue() {
-
+  addToQueue(track_id: string) {
+    console.log("Adding track to queue: ", track_id)
+    this.spotifyService.addToQueue(track_id).subscribe((res: any) => {
+      console.log(res);
+    })
   }
 }

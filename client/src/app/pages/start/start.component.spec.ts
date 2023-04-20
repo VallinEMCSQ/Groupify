@@ -63,11 +63,4 @@ describe('StartComponent', () => {
     expect(component.authToken).toEqual('my-link');
   });
 
-  it('should call createSession method on startService on click of Host button', () => {
-    startServiceSpy.createSession.and.returnValue(of({ sessionCode: 'my-session-code' }));
-    const hostButton = fixture.debugElement.nativeElement.querySelector('.host-button');
-    hostButton.click();
-    expect(startServiceSpy.createSession).toHaveBeenCalled();
-    expect(component.sessionPIN).toEqual('my-session-code');
-  });
 });

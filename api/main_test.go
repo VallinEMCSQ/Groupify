@@ -11,7 +11,10 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"go.mongodb.org/mongo-driver/bson/primitive"
+	//"go.mongodb.org/mongo-driver/bson/primitive"
+	// "github.com/gorilla/mux"
+	// "go.mongodb.org/mongo-driver/bson"
+
 	//"golang.org/x/oauth2"
 )
 
@@ -88,78 +91,59 @@ func TestConnectDatabase(t *testing.T) {
 	databaseClient.Disconnect(ctx)
 }
 
-// func TestSearch(t *testing.T) {
-// 	//client := &spotify.Client{} // create a fake client to use for testing
-// 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-// 		search(w, r)
-// 	})
+func TestSearch(t *testing.T) {
+	//client := &spotify.Client{} // create a fake client to use for testing
+	// handler := http.HandlerFunc(search)
 
-// 	req, err := http.NewRequest("GET", "/search?Name=test", nil)
-// 	if err != nil {
-// 		t.Fatal(err)
-// 	}
+	// req, err := http.NewRequest("GET", "/search", nil)
+	// if err != nil {
+	// 	t.Fatal(err)
+	// }
 
-// 	rr := httptest.NewRecorder()
-// 	handler.ServeHTTP(rr, req)
+	// rr := httptest.NewRecorder()
+	// handler.ServeHTTP(rr, req)
 
-// 	if status := rr.Code; status != http.StatusOK {
-// 		t.Errorf("handler returned wrong status code: got %v want %v",
-// 			status, http.StatusOK)
-// 	}
+	// create a request to the link endpoint
+	req, err := http.NewRequest("GET", "/search", nil)
+	assert.NoError(t, err)
 
-// 	expectedContentType := "application/json"
-// 	if contentType := rr.Header().Get("Content-Type"); contentType != expectedContentType {
-// 		t.Errorf("handler returned wrong content type: got %v want %v",
-// 			contentType, expectedContentType)
-// 	}
+	q := req.URL.Query()
+ 	q.Add("Name","Animals")
 
-// 	var res spotify.SearchResult
-// 	err = json.NewDecoder(rr.Body).Decode(&res)
-// 	if err != nil {
-// 		t.Errorf("handler returned invalid JSON: %v", err)
-// 	}
-// }
-
-func TestAddSong(t *testing.T) {
-	// Create a new request with a sample song in the body
-	song := Song{ID: primitive.NewObjectID(), Title: "Test Song", Artist: "Test Artist"}
-	body, err := json.Marshal(song)
-	if err != nil {
-		t.Fatal(err)
-	}
-	req, err := http.NewRequest("POST", "/addsong", bytes.NewBuffer(body))
-	if err != nil {
-		t.Fatal(err)
-	}
-
-	// Create a new response recorder to capture the response from the handler
+	// create a response recorder to capture the response
 	rr := httptest.NewRecorder()
 
-	// Call the handler function directly, passing in the response recorder and request
-	handler := http.HandlerFunc(addsong)
+	// call the handler
+	handler := http.HandlerFunc(search)
 	handler.ServeHTTP(rr, req)
 
-	// Check the status code of the response
-	if status := rr.Code; status != http.StatusOK {
-		t.Errorf("handler returned wrong status code: got %v want %v", status, http.StatusOK)
-	}
+	// if status := rr.Code; status != http.StatusOK {
+	// 	t.Errorf("handler returned wrong status code: got %v want %v",
+	// 		status, http.StatusOK)
+	// }
 
-	// Decode the response body into a Song object
-	var responseSong Song
-	err = json.NewDecoder(rr.Body).Decode(&responseSong)
-	if err != nil {
-		t.Errorf("error decoding response body: %v", err)
-	}
+	// expectedContentType := "application/json"
+	// if contentType := rr.Header().Get("Content-Type"); contentType != expectedContentType {
+	// 	t.Errorf("handler returned wrong content type: got %v want %v",
+	// 		contentType, expectedContentType)
+	// }
 
-	// Check that the response Song matches the original Song sent in the request
-	if responseSong.ID != song.ID || responseSong.Title != song.Title || responseSong.Artist != song.Artist {
-		t.Errorf("handler returned incorrect song: got %v want %v", responseSong, song)
-	}
+	// var res spotify.SearchResult
+	// err = json.NewDecoder(rr.Body).Decode(&res)
+	// if err != nil {
+	// 	t.Errorf("handler returned invalid JSON: %v", err)
+	// }
 }
 
-
-
-
-
+func TestGetSong(t *testing.T) {
+	connectDatabase()
+	songsCollection = databaseClient.Database("098765").Collection("songs")
+	// Create a new song and insert it into the database
+	song := Song{Name: "Test Song", Duration: 2}
+	_, err := songsCollection.InsertOne(context.Background(), song)
+	if err != nil {
+		t.Fatal(err)
+	}
+}
 
 

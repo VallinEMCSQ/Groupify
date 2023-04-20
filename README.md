@@ -9,6 +9,29 @@ The group minigame will begin with a category being randomly generated. Then, ea
 
 The front-end of this project will be handled by Cameron Vallin and Teresa Vu, while the back-end will be handled by Michelle Vu and Sammy Clark.  
 
+## Installation
+To run this program, you need to have both GOLANG and Angular.
+
+To download Angular, visit 
+[here](https://code.visualstudio.com/docs/nodejs/angular-tutorial).
+
+To download Golang, visit 
+[here](https://go.dev/doc/install). 
+
+-After following the steps to download Angular, cd to the client folder in a terminal and run the following command
+
+`ng add @angular/material`
+
+## Running
+
+
+
+## Authentication
+
+We use Spotify's own authetication and authorization methods that can be called upon using the Spotify API. The Authentication is done behind the scenes by simply logging into your own spotify account.
+
 ## Ideas: 
        Democratic song upvoting or Queue leader(Leader must approve queued songs) 
        Mini-Games: Guessing who queued a song, voting for worst song
+       
+

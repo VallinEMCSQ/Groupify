@@ -31,5 +31,37 @@ Front-end Functionality
 - Twenty songs or artist results searched using the entered string are displayed to the user as a list, to be selected and potentially added to the queue
 - Current playing songs are displayed to the user on a mat-card providing the song title, artist name, and album cover (Received from the backend)
 Front End Unit Tests
+StartComponent
+- should call getToken method on startService with code and state on ngOnInit
+- should create
+JoinScreenComponent
+- should set the loginUrl property with the response from getAuthUrl
+- should create
+HostComponent
+- should create
+PlayerComponent
+- should create
+- should create a search form
+- should call spotifyService.search() on form submit
+- should call spotifyService.next() on next button click
+- should call spotifyService.togglePlay() on play button click
+- should call spotifyService.previous() on previous button click
+AppComponent
+- should create the app
+- should have as title 'Groupify'
+StartService
+- should be created
+JoinScreenService
+- should be created
+SpotifyService
+- should log an error message when authentication_error event is emitted
+- should log an error message when account_error event is emitted
+- should log an error message when initialization_error event is emitted
+- should call loadScript when initializePlayer is called
+- should be created
 Front End Cypress Tests
-
+- it clicks the login button which redirects to the Spotify authorization
+- it navigates to the host page when the host button is clicked
+- it accepts input in the search bar
+- it plays a song when the play button is clicked
+- it displays a six-digit session PIN

@@ -17,13 +17,13 @@
 
   <div style="border: 5px" *ngFor="let track of searchResults">
     {{track.name}}
-    <button (click)="addToQueue(track.id)">Add</button>
+    <button @fadeIn @expandUp (click)="addToQueue(track.id)">Add</button>
   </div>
   <!-- <div class="search-section__input-container">
     <input class="search-section__input" type="text" id="inputSearch" placeholder="Search artist or track" (keyup)="search(searchTerm.value)" (keydown.backspace)="search(searchTerm.value)" #searchTerm>
   </div> -->
 
-  <div class="current-track" *ngIf="current_track" @expandUp @fadeIn style="margin: 0 auto; display: table;">
+  <div @fadeIn class="current-track" *ngIf="current_track" @expandUp @fadeIn style="margin: 0 auto; display: table;">
     <mat-card class="current-track"> 
       <mat-card-header>
         <mat-card-title-group style="margin: 5px;" >
